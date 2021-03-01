@@ -115,7 +115,8 @@ def fragments(uri):
     """
     Output the fragment information of a TileDB array located at uri.
     """
-    click.echo(tiledb.array_fragments(uri))
+    pp = pprint.PrettyPrinter()
+    click.echo(pp.pformat(tiledb.array_fragments(uri)))
 
 
 root.add_command(dump)
