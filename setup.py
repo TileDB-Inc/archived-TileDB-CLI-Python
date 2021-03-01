@@ -38,6 +38,7 @@ setup(
     extras_require={
         "dev": [
             "black",
+<<<<<<< HEAD
             "cmake >= 3.13",
             "cython",
             "pybind11",
@@ -47,6 +48,9 @@ setup(
             "pandas ; python_version > '3.5'",
             "pyarrow",
             "pytest",
+=======
+            "Pytest",
+>>>>>>> Completed Tests for TileDB Dump Utility
         ]
     },
     entry_points="""
