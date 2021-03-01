@@ -41,7 +41,7 @@ setup(
     extras_require={"dev": ["Pytest==6.2.2"]},
     entry_points="""
         [console_scripts]
-        tiledb=commands.root:root
+        tiledb=dump:root
     """,
     classifiers=[
         "Development Status :: 4 - Beta",

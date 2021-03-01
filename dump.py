@@ -5,7 +5,7 @@ import pprint
 
 
 @click.group()
-def tiledb_top_level_entry():
+def root():
     pass
 
 
@@ -68,26 +68,60 @@ def schema(uri):
     multiple=True,
     default=[],
 )
-def array(uri, attribute):
+@click.option(
+    "--rows",
+    "-n",
+    metavar="<start int> <end int>",
+    help=(
+        "Output data from the range of rows beginning with <start int> and "
+        "ending with <end int>. By default, '-n 1 5' which outputs the first "
+        "five rows"
+    ),
+    nargs=2,
+    type=int,
+    default=(1, 5),
+)
+def array(uri, attribute, rows):
     """
     Output the data of a TileDB array located at uri.
     """
     with tiledb.open(uri) as array:
         pp = pprint.PrettyPrinter()
-        subarray = array[:10]
 
-        if not attribute:
-            click.echo(pp.pformat(dict(subarray)))
+        if rows[0] <= 0 or rows[1] <= 0:
+            raise click.BadOptionUsage(
+                option_name="rows",
+                message="The arguments to --rows/-n needs to be positive integers.",
+            )
+
+        subarray = array[rows[0] : rows[1] + 1]
+
+        if not array.schema.sparse and not array.schema.attr(0).name:
+            click.echo(pp.pformat({"": subarray}))
         else:
+            if not attribute:
+                attribute = [
+                    array.schema.attr(n).name for n in range(array.schema.nattr)
+                ]
             filtered_subarray = {
                 key: value for (key, value) in subarray.items() if key in attribute
             }
             click.echo(pp.pformat(filtered_subarray))
 
 
-tiledb_top_level_entry.add_command(dump)
+@click.command()
+@click.argument("uri")
+def fragments(uri):
+    """
+    Output the fragment information of a TileDB array located at uri.
+    """
+    click.echo(tiledb.array_fragments(uri))
+
+
+root.add_command(dump)
 dump.add_command(array)
 dump.add_command(config)
 dump.add_command(metadata)
 dump.add_command(nonempty_domain)
 dump.add_command(schema)
+dump.add_command(fragments)
