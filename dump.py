@@ -111,12 +111,34 @@ def array(uri, attribute, rows):
 
 @click.command()
 @click.argument("uri")
-def fragments(uri):
+@click.option(
+    "--index",
+    "-i",
+    metavar="<int>",
+    help=(
+        "Output data from the given fragment number. Zero indexing is used. "
+        "By default, info from all fragments are shown"
+    ),
+    type=int,
+    default=None,
+)
+@click.option("--number", "-n", help=("Output the number of fragments"), is_flag=True)
+def fragments(uri, index, number):
     """
     Output the fragment information of a TileDB array located at uri.
     """
     pp = pprint.PrettyPrinter()
-    click.echo(pp.pformat(tiledb.array_fragments(uri)))
+
+    fragments = tiledb.array_fragments(uri)
+
+    if number:
+        click.echo(len(fragments))
+        exit()
+
+    if index is not None:
+        fragments = fragments[index]
+
+    click.echo(pp.pformat(fragments))
 
 
 root.add_command(dump)

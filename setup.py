@@ -23,8 +23,7 @@ setup(
     url="https://github.com/TileDB-Inc/TileDB-CLI",
     license="MIT",
     platforms=["any"],
-    py_modules=["commands.root"],
-    packages=["commands"],
+    py_modules=["dump"],
     install_requires=[
         "click==7.1.2",
         "numpy==1.16.0",
@@ -38,7 +37,12 @@ setup(
         "local_scheme": "dirty-tag",
         "write_to": "./version.py",
     },
-    extras_require={"dev": ["Pytest==6.2.2"]},
+    extras_require={
+        "dev": [
+            "black",
+            "Pytest",
+        ]
+    },
     entry_points="""
         [console_scripts]
         tiledb=dump:root
