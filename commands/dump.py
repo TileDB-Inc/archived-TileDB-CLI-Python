@@ -5,11 +5,6 @@ import pprint
 
 
 @click.group()
-def root():
-    pass
-
-
-@click.group()
 def dump():
     pass
 
@@ -141,7 +136,6 @@ def fragments(uri, index, number):
     click.echo(pp.pformat(fragments))
 
 
-root.add_command(dump)
 dump.add_command(array)
 dump.add_command(config)
 dump.add_command(metadata)

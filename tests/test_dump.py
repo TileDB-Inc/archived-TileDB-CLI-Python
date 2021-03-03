@@ -1,6 +1,6 @@
 import tiledb
 from common import pp, test_array_names
-from dump import root
+from commands.root import root
 
 import ast
 from click.testing import CliRunner
