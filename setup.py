@@ -1,4 +1,12 @@
+import os
 from setuptools import setup
+
+
+# Directory containing this file
+CONTAINING_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# TileDB-CLI command source directory
+TILEDB_PKG_DIR = os.path.join(CONTAINING_DIR, "commands")
 
 with open("README.md") as f:
     README_MD = f.read()
@@ -12,34 +20,45 @@ setup(
     author_email="help@tiledb.io",
     maintainer="TileDB, Inc.",
     maintainer_email="help@tiledb.io",
-    url="https://github.com/TileDB-Inc/TileDB-Py",
-    py_modules=["dump"],
+    url="https://github.com/TileDB-Inc/TileDB-CLI",
+    license="MIT",
+    platforms=["any"],
+    py_modules=["commands.root"],
+    packages=["commands"],
     install_requires=[
-        "Click",
-        "cython>=0.27",
-        "numpy==1.16.5 ; python_version < '3.9'",
-        "numpy ; python_version >= '3.9'",
+        "click==7.1.2",
+        "numpy==1.16.0",
         "setuptools>=18.0",
         "setuptools_scm>=1.5.4",
         "wheel>=0.30",
-        "pybind11>=2.6.2",
-        "tiledb",
+        "tiledb",  # will require a later version that includes array_fragments() command
     ],
-    license="MIT",
     use_scm_version={
         "version_scheme": "guess-next-dev",
         "local_scheme": "dirty-tag",
         "write_to": "./version.py",
     },
-    extras_require={
-        "dev": [
-            "black",
-            "Pytest",
-            "pytest-lazy-fixture",
-        ]
-    },
+    extras_require={"dev": ["Pytest==6.2.2"]},
     entry_points="""
         [console_scripts]
-        tiledb=dump:tiledb_top_level_entry
+        tiledb=commands.root:root
     """,
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Operating System :: Unix",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+    ],
 )
