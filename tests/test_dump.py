@@ -184,7 +184,7 @@ class TestArray:
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
+        raw_array = re.findall(r"array\(\[(.*?)\]\)", "".join(result.stdout.split()))
         assert len(raw_array) == 2
 
         raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
@@ -276,7 +276,7 @@ class TestArray:
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
+        raw_array = re.findall(r"array\(\[(.*?)\]\)", "".join(result.stdout.split()))
         assert len(raw_array) == 2
 
         raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
