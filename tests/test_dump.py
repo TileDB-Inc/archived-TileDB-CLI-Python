@@ -363,7 +363,9 @@ class TestFragments:
         assert result.exit_code == 0
 
         output = ast.literal_eval("".join(result.stdout.split()))
-        assert output["array_uri"] == f"{temp_rootdir}/dense_25x12_mult"
+        assert output["array_uri"] == os.path.join(
+            f"{temp_rootdir}", "dense_25x12_mult"
+        )
         assert output["cell_num"] == (300, 300)
         assert output["dense"] == (True, True)
         assert output["has_consolidated_metadata"] == (False, False)
@@ -386,7 +388,9 @@ class TestFragments:
         assert result.exit_code == 0
 
         output = ast.literal_eval("".join(result.stdout.split()))
-        assert output["array_uri"] == f"{temp_rootdir}/sparse_25x12_mult"
+        assert output["array_uri"] == os.path.join(
+            f"{temp_rootdir}", "sparse_25x12_mult"
+        )
         assert output["cell_num"] == (300, 300)
         assert output["dense"] == (False, False)
         assert output["has_consolidated_metadata"] == (False, False)
