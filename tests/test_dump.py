@@ -90,6 +90,8 @@ class TestArray:
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
+        print(result.stdout)
+
         raw_resulting_array = re.findall(r"array\(\[([\s\S]+)\]\)", result.stdout)
         assert len(raw_resulting_array) == 1
 
