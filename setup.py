@@ -26,11 +26,9 @@ setup(
     py_modules=["dump"],
     install_requires=[
         "click==7.1.2",
-        "numpy==1.16.0",
-        "setuptools>=18.0",
-        "setuptools_scm>=1.5.4",
-        "wheel>=0.30",
-        "tiledb",  # will require a later version that includes array_fragments() command
+        "numpy>=1.16.*",
+        "setuptools",
+        "tiledb>=0.8.5",
     ],
     use_scm_version={
         "version_scheme": "guess-next-dev",
@@ -40,7 +38,15 @@ setup(
     extras_require={
         "dev": [
             "black",
-            "Pytest",
+            "cmake >= 3.13",
+            "cython",
+            "pybind11",
+            "wheel",
+            "setuptools-scm",
+            "dask",
+            "pandas ; python_version > '3.5'",
+            "pyarrow",
+            "pytest",
         ]
     },
     entry_points="""
