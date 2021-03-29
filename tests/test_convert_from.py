@@ -305,7 +305,7 @@ class TestCSV:
 
         runner = CliRunner()
         result = runner.invoke(
-            root, ["convert-from", "csv", input_path, uri, "-A", "GzipFilter"]
+            root, ["convert-from", "csv", input_path, uri, "-A", "GzipFilter=9"]
         )
         assert result.exit_code == 0
 
@@ -328,9 +328,9 @@ class TestCSV:
                 input_path,
                 uri,
                 "-A",
-                "a:LZ4Filter,BitShuffleFilter",
+                "a:LZ4Filter=10,BitShuffleFilter",
                 "-A",
-                "b:GzipFilter,PositiveDeltaFilter",
+                "b:DoubleDeltaFilter,PositiveDeltaFilter=3",
             ],
         )
         assert result.exit_code == 0
@@ -347,7 +347,7 @@ class TestCSV:
 
         runner = CliRunner()
         result = runner.invoke(
-            root, ["convert-from", "csv", input_path, uri, "-A", "GzipFilter"]
+            root, ["convert-from", "csv", input_path, uri, "-D", "GzipFilter=9"]
         )
         assert result.exit_code == 0
 
@@ -369,10 +369,10 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "-A",
-                "a:LZ4Filter,BitShuffleFilter",
-                "-A",
-                "b:GzipFilter,PositiveDeltaFilter",
+                "-D",
+                "a:LZ4Filter=10,BitShuffleFilter",
+                "-D",
+                "b:DoubleDeltaFilter,PositiveDeltaFilter=3",
             ],
         )
         assert result.exit_code == 0
@@ -389,6 +389,6 @@ class TestCSV:
 
         runner = CliRunner()
         result = runner.invoke(
-            root, ["convert-from", "csv", input_path, uri, "-C", "GzipFilter"]
+            root, ["convert-from", "csv", input_path, uri, "-C", "GzipFilter=9"]
         )
         assert result.exit_code == 0

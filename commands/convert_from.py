@@ -12,56 +12,74 @@ class FilterList(click.ParamType):
     name = "filter_list"
 
     def convert(self, value, param, ctx):
-        filter_name_to_function = {
-            "GzipFilter": tiledb.GzipFilter(),
-            "ZstdFilter": tiledb.ZstdFilter(),
-            "LZ4Filter": tiledb.LZ4Filter(),
-            "Bzip2Filter": tiledb.Bzip2Filter(),
-            "RleFilter": tiledb.RleFilter(),
-            "DoubleDeltaFilter": tiledb.DoubleDeltaFilter(),
-            "BitShuffleFilter": tiledb.BitShuffleFilter(),
-            "ByteShuffleFilter": tiledb.ByteShuffleFilter(),
-            "BitWidthReductionFilter": tiledb.BitWidthReductionFilter(),
-            "PositiveDeltaFilter": tiledb.PositiveDeltaFilter(),
-        }
-
         values = str(value).split(":")
 
         if len(values) == 1:
-            provided_filters = values[0].split(",")
-            bad_filters = set(provided_filters) - set(filter_name_to_function.keys())
-            if bad_filters:
-                self.fail(
-                    f"Saw the following bad <filter names>: {bad_filters}",
-                    param,
-                    ctx,
-                )
-            return tiledb.FilterList(
-                [
-                    filter_name_to_function[filter_name]
-                    for filter_name in provided_filters
-                ]
-            )
+            return self.parse_filters(values[0], param, ctx)
         elif len(values) == 2:
-            provided_filters = values[1].split(",")
-            bad_filters = set(provided_filters) - set(filter_name_to_function.keys())
-            if bad_filters:
-                self.fail(
-                    f"Saw the following bad <filter names>: {bad_filters}",
-                    param,
-                    ctx,
-                )
-            return (
-                values[0],
-                tiledb.FilterList(
-                    [
-                        filter_name_to_function[filter_name]
-                        for filter_name in provided_filters
-                    ]
-                ),
-            )
+            return (values[0], self.parse_filters(values[1], param, ctx))
         else:
             self.fail(f"Too many arguments provided", param, ctx)
+
+    def parse_filters(self, filter_and_options, param, ctx):
+        filter_name_to_function = {
+            "GzipFilter": tiledb.GzipFilter,
+            "ZstdFilter": tiledb.ZstdFilter,
+            "LZ4Filter": tiledb.LZ4Filter,
+            "Bzip2Filter": tiledb.Bzip2Filter,
+            "RleFilter": tiledb.RleFilter,
+            "DoubleDeltaFilter": tiledb.DoubleDeltaFilter,
+            "BitShuffleFilter": tiledb.BitShuffleFilter,
+            "ByteShuffleFilter": tiledb.ByteShuffleFilter,
+            "BitWidthReductionFilter": tiledb.BitWidthReductionFilter,
+            "PositiveDeltaFilter": tiledb.PositiveDeltaFilter,
+        }
+
+        provided_filter_and_options = dict()
+        for value in filter_and_options.split(","):
+            filter_and_option = value.split("=")
+
+            filter = filter_and_option[0]
+            if len(filter_and_option) == 1:
+                provided_filter_and_options[filter] = None
+            elif len(filter_and_option) == 2:
+                try:
+                    provided_filter_and_options[filter] = int(filter_and_option[1])
+                except ValueError:
+                    self.fail(
+                        f"{filter_and_option[1]} is not a valid integer "
+                        f"for {provided_filter_and_options[filter]}",
+                        param,
+                        ctx,
+                    )
+            else:
+                self.fail(
+                    "Too many arguments provided for "
+                    f"{provided_filter_and_options[filter]}",
+                    param,
+                    ctx,
+                )
+
+        bad_filters = set(provided_filter_and_options.keys()) - set(
+            filter_name_to_function.keys()
+        )
+        if bad_filters:
+            self.fail(
+                f"Saw the following bad <filter names>: {bad_filters}",
+                param,
+                ctx,
+            )
+
+        filter_list = []
+        for filter_name in provided_filter_and_options:
+            filter_function = filter_name_to_function[filter_name]
+            filter_option = provided_filter_and_options[filter_name]
+            if filter_option is None:
+                filter_list.append(filter_function())
+            else:
+                filter_list.append(filter_function(filter_option))
+
+        return tiledb.FilterList(filter_list)
 
 
 class OptionalInt(click.ParamType):
