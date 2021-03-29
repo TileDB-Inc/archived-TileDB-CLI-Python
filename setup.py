@@ -21,24 +21,17 @@ setup(
     maintainer="TileDB, Inc.",
     maintainer_email="help@tiledb.io",
     url="https://github.com/TileDB-Inc/TileDB-CLI",
-    license="MIT",
-    platforms=["any"],
-    py_modules=["dump"],
+    py_modules=["commands.root"],
+    packages=["commands"],
     install_requires=[
         "click==7.1.2",
         "numpy>=1.16.*",
         "setuptools",
         "tiledb>=0.8.5",
     ],
-    use_scm_version={
-        "version_scheme": "guess-next-dev",
-        "local_scheme": "dirty-tag",
-        "write_to": "./version.py",
-    },
     extras_require={
         "dev": [
             "black",
-<<<<<<< HEAD
             "cmake >= 3.13",
             "cython",
             "pybind11",
@@ -48,14 +41,17 @@ setup(
             "pandas ; python_version > '3.5'",
             "pyarrow",
             "pytest",
-=======
-            "Pytest",
->>>>>>> Completed Tests for TileDB Dump Utility
         ]
+    },
+    license="MIT",
+    use_scm_version={
+        "version_scheme": "guess-next-dev",
+        "local_scheme": "dirty-tag",
+        "write_to": "./version.py",
     },
     entry_points="""
         [console_scripts]
-        tiledb=dump:root
+        tiledb=commands.root:root
     """,
     classifiers=[
         "Development Status :: 4 - Beta",

@@ -117,7 +117,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -c <int>
+            tiledb convert_from [csv_file] [uri] -n <int>
         """
         test_name = "simple"
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -126,7 +126,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-c", 1],
+            ["convert-from", "csv", input_path, uri, "-n", 1],
         )
 
         assert result.exit_code == 0
@@ -135,7 +135,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -C (row-major | column-major | global)
+            tiledb convert_from [csv_file] [uri] -c (row-major | column-major | global)
         """
         test_name = "simple"
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -144,7 +144,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-C", "global"],
+            ["convert-from", "csv", input_path, uri, "-c", "global"],
         )
 
         assert result.exit_code == 0
@@ -225,7 +225,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -C (row-major | column-major | global)
+            tiledb convert_from [csv_file] [uri] -c (row-major | column-major | global)
         """
         test_name = "simple"
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -234,7 +234,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-C", "global"],
+            ["convert-from", "csv", input_path, uri, "-c", "global"],
         )
 
         assert result.exit_code == 0
@@ -243,7 +243,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -t <int>
+            tiledb convert_from [csv_file] [uri] -T <int>
         """
         test_name = "simple"
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -252,7 +252,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-t", 3],
+            ["convert-from", "csv", input_path, uri, "-T", 3],
         )
 
         assert result.exit_code == 0
@@ -261,7 +261,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -t <column name> <int>
+            tiledb convert_from [csv_file] [uri] -T <column name> <int>
         """
         test_name = "simple"
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -270,7 +270,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-t", "a:3", "-t", "b:2"],
+            ["convert-from", "csv", input_path, uri, "-T", "a:3", "-T", "b:2"],
         )
 
         assert result.exit_code == 0
@@ -291,4 +291,104 @@ class TestCSV:
             ["convert-from", "csv", input_path, uri, "-u", 3],
         )
 
+        assert result.exit_code == 0
+
+    def test_attr_filters(self, temp_rootdir):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] -A <filter name>,<filter name>,...
+        """
+        test_name = "simple"
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_attr_filters.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root, ["convert-from", "csv", input_path, uri, "-A", "GzipFilter"]
+        )
+        assert result.exit_code == 0
+
+    def test_attr_filters_multi(self, temp_rootdir):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] -A <attr name>:<filter name>,<filter name>,...
+        """
+        test_name = "simple"
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_attr_filters_multi.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root,
+            [
+                "convert-from",
+                "csv",
+                input_path,
+                uri,
+                "-A",
+                "a:LZ4Filter,BitShuffleFilter",
+                "-A",
+                "b:GzipFilter,PositiveDeltaFilter",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_dim_filters(self, temp_rootdir):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] -D <filter name>,<filter name>,...
+        """
+        test_name = "simple"
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_dim_filters.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root, ["convert-from", "csv", input_path, uri, "-A", "GzipFilter"]
+        )
+        assert result.exit_code == 0
+
+    def test_dim_filters_multi(self, temp_rootdir):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] -D <dim name>:<filter name>,<filter name>,...
+        """
+        test_name = "simple"
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_dim_filters_multi.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root,
+            [
+                "convert-from",
+                "csv",
+                input_path,
+                uri,
+                "-A",
+                "a:LZ4Filter,BitShuffleFilter",
+                "-A",
+                "b:GzipFilter,PositiveDeltaFilter",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_coords_filters(self, temp_rootdir):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] -C <filter name>,<filter name>,...
+        """
+        test_name = "simple"
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_coords_filters.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root, ["convert-from", "csv", input_path, uri, "-C", "GzipFilter"]
+        )
         assert result.exit_code == 0
