@@ -118,24 +118,24 @@ class TileSpecifier(click.ParamType):
     "--allows-duplicates/--no-duplicates",
     help=(
         "Generated schema should allow duplicates. "
-        "By default, duplciates are allowed"
+        "By default, duplicates are allowed"
     ),
     default=True,
 )
 @click.option(
     "--cell-order",
     "-c",
-    metavar="(row-major | column-major | global)",
+    metavar="(row-major | col-major | global)",
     help=("Specify the cell ordering. By default, row-major"),
-    type=click.Choice(["row-major", "column-major", "global"], case_sensitive=True),
+    type=click.Choice(["row-major", "col-major", "global"], case_sensitive=True),
     default="row-major",
 )
 @click.option(
     "--tile-order",
     "-t",
-    metavar="ingest | schema_only | append",
+    metavar="(row-major | col-major | global)",
     help=("Specify the tile ordering. By default, row-major"),
-    type=click.Choice(["row-major", "column-major", "global"], case_sensitive=True),
+    type=click.Choice(["row-major", "col-major", "global"], case_sensitive=True),
     default="row-major",
 )
 @click.option(
@@ -162,7 +162,7 @@ class TileSpecifier(click.ParamType):
     help=(
         "Provide a comma separated list of filters to apply to each attribute. "
         "Alternatively, assign filters to each attribute by passing the flag "
-        "multiple times (e.g. '-t attr_x:5 -t attr_y:8'). Unspecified dimensions "
+        "multiple times (e.g. '-A attr_x:5 -A attr_y:8'). Unspecified dimensions "
         "will use default."
     ),
     multiple=True,
@@ -176,7 +176,7 @@ class TileSpecifier(click.ParamType):
     help=(
         "Provide a comma separated list of filters to apply to each dimension. "
         "Alternatively, assign filters to each dimension by passing the flag "
-        "multiple times (e.g. '-t attr_x:5 -t attr_y:8'). Unspecified dimensions "
+        "multiple times (e.g. '-D attr_x:5 -D attr_y:8'). Unspecified dimensions "
         "will use default."
     ),
     multiple=True,
@@ -206,7 +206,7 @@ class TileSpecifier(click.ParamType):
         "Providing a single <int> will apply the tiling to each dimension. "
         "Assign tiling to a specific dimension by providing the <column name>:<int>. "
         "Alternatively, assign tilling to each dimension by passing the flag "
-        "multiple times (e.g. '-t dim_x:5 -t dim_y:8')"
+        "multiple times (e.g. '-T dim_x:5 -T dim_y:8')"
     ),
     multiple=True,
     type=TileSpecifier(),
@@ -282,9 +282,9 @@ def csv(
     Available <filter name> options: GzipFilter, ZstdFilter, LZ4Filter, Bzip2Filter, RleFilter, DoubleDeltaFilter, BitShuffleFilter, ByteShuffleFilter, BitWidthReductionFilter, PositiveDeltaFilter
     """
     if tile:
-        if len(tile) == 1:
+        if len(tile) == 1 and isinstance(tile[0], int):
             tile = tile[0]
-        elif len(tile) > 1:
+        else:
             if any(isinstance(t, int) for t in tile):
                 raise click.BadOptionUsage(
                     "The --tile/-t flag can only be used once if using an <int> argument. "
@@ -334,6 +334,7 @@ def csv(
         timestamp=timestamp,
         row_start_idx=row_start_idx,
         date_spec=dict(date_spec) if date_spec else None,
+        # pandas keyword args
     )
 
 
