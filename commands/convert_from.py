@@ -1,6 +1,8 @@
 import tiledb
 
+import collections
 import click
+import pprint as pp
 
 
 @click.group()
@@ -120,32 +122,61 @@ class FilterList(click.ParamType):
     type=FilterList(),
     default=(),
 )
-@click.option(
-    "--date-spec",
-    "-d",
-    metavar="<column> <datetime format spec>",
-    help=(
-        "Apply a datetime format spec to the column. Format must be specified "
-        "using the Python format codes: "
-        "\n"
-        "\thttps://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior"
-        "\n"
-        "Multiple columns may be provided by passing the flag multiple times "
-        "(e.g. '-d col1 %d/%m/%y -d col2 %A %d. %B %Y')"
-    ),
-    multiple=True,
-    nargs=2,
-    type=str,
-)
 @click.pass_context
-def csv(ctx, csv_file, uri, attr_filters, coords_filters, dim_filters, date_spec):
+def csv(ctx, csv_file, uri, attr_filters, coords_filters, dim_filters):
     """
     Convert a csv_file into a TileDB array located at uri.
     """
-
     kwargs = dict()
 
+    kwargslist = []
+    args_iter = iter(ctx.args)
+    for arg in args_iter:
+        dashedoption = arg
+        rhs = next(args_iter)
+
+        if dashedoption[:2] == "--":
+            opt = dashedoption[2:]
+        else:
+            raise click.UsageError(f"Saw ill-formed option {arg}.")
+
+        opt = opt.replace("-", "_")
+        rhsvalues = rhs.split(",")
+
+        for rhsval in rhsvalues:
+            k, sep, v = rhsval.partition(":")
+
+            if v:
+                kwargslist.append((opt, (k, v)))
+            else:
+                kwargslist.append((opt, k))
+
     bool = {"True": True, "False": False}
+    kwargscol = collections.defaultdict(list)
+    for k, v in kwargslist:
+        if isinstance(v, tuple):
+            if v[1].isnumeric():
+                v = (v[0], int(v[1]))
+            elif v[1] in bool:
+                v = (v[0], bool[v[1]])
+            else:
+                v = (v[0], str(v[1]))
+        elif v.isnumeric():
+            v = int(v)
+        elif v in bool:
+            v = bool[v]
+        else:
+            v = str(v)
+        kwargscol[k].append(v)
+
+    kwargs = dict()
+    for k, v in kwargscol.items():
+        if len(v) > 0 and isinstance(v[0], tuple):
+            kwargs[k] = dict(v)
+        elif len(v) == 1:
+            kwargs[k] = v[0]
+        else:
+            kwargs[k] = v
 
     if attr_filters:
         if len(attr_filters) == 1:
@@ -176,45 +207,7 @@ def csv(ctx, csv_file, uri, attr_filters, coords_filters, dim_filters, date_spec
             dim_filters = dict(dim_filters)
         kwargs["dim_filters"] = dim_filters
 
-    if date_spec:
-        kwargs["date_spec"] = dict(date_spec)
-
-    for arg in ctx.args:
-        dashedoption, sep, rhs = arg.partition("=")
-
-        if dashedoption[:2] == "--":
-            opt = dashedoption[2:]
-        else:
-            raise click.UsageError(f"Saw ill-formed option {arg}.")
-
-        opt = opt.replace("-", "_")
-        rhsvalues = rhs.split(",")
-        kwargsval = dict()
-        for rhsval in rhsvalues:
-            dictkey, sep, dictval = rhsval.partition(":")
-
-            # TODO clean this
-            if not dictval:
-                if dictkey.isnumeric():
-                    kwargs[opt] = int(dictkey)
-                elif dictkey in bool:
-                    kwargs[opt] = bool[dictkey]
-                else:
-                    kwargs[opt] = str(dictkey)
-            else:
-                if dictval.isnumeric():
-                    kwargsval[dictkey] = int(dictval)
-                elif dictval in bool:
-                    kwargsval[dictkey] = bool[dictval]
-                else:
-                    kwargsval[dictkey] = str(dictval)
-                kwargs[opt] = kwargsval
-
-    tiledb.from_csv(
-        uri,
-        csv_file,
-        **kwargs,
-    )
+    tiledb.from_csv(uri, csv_file, **kwargs)
 
 
 convert_from.add_command(csv)

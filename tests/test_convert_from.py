@@ -76,7 +76,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --sparse=True
+            tiledb convert_from [csv_file] [uri] --sparse True
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -85,7 +85,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--sparse=True"],
+            ["convert-from", "csv", input_path, uri, "--sparse", "True"],
         )
 
         assert result.exit_code == 0
@@ -97,7 +97,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --sparse=False
+            tiledb convert_from [csv_file] [uri] --sparse False
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -106,7 +106,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--sparse=False"],
+            ["convert-from", "csv", input_path, uri, "--sparse", "False"],
         )
 
         assert result.exit_code == 0
@@ -118,7 +118,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --allows-duplicates=(False|True)
+            tiledb convert_from [csv_file] [uri] --allows-duplicates (False|True)
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -133,8 +133,10 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=True",
-                "--allows-duplicates=False",
+                "--sparse",
+                "True",
+                "--allows-duplicates",
+                "False",
             ],
         )
 
@@ -153,8 +155,10 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=True",
-                "--allows-duplicates=True",
+                "--sparse",
+                "True",
+                "--allows-duplicates",
+                "True",
             ],
         )
 
@@ -167,7 +171,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --capacity=<int>
+            tiledb convert_from [csv_file] [uri] --capacity <int>
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -176,7 +180,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--capacity=123456"],
+            ["convert-from", "csv", input_path, uri, "--capacity", "123456"],
         )
 
         assert result.exit_code == 0
@@ -188,7 +192,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --cell-order=(row-major|col-major|global)
+            tiledb convert_from [csv_file] [uri] --cell-order (row-major|col-major|global)
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -197,7 +201,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--cell-order=global"],
+            ["convert-from", "csv", input_path, uri, "--cell-order", "global"],
         )
 
         assert result.exit_code == 0
@@ -209,7 +213,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --full-domain
+            tiledb convert_from [csv_file] [uri] --full-domain (True|False)
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -218,7 +222,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--full-domain=True"],
+            ["convert-from", "csv", input_path, uri, "--full-domain", "True"],
         )
 
         assert result.exit_code == 0
@@ -232,7 +236,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --date-spec <column> <datetime format spec>
+            tiledb convert_from [csv_file] [uri] --date-spec <column>:<datetime format spec>,...
         """
         test_name, expected_output = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -241,7 +245,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "-d", "date", "%b/%d/%Y"],
+            ["convert-from", "csv", input_path, uri, "--date-spec", "date:%b/%d/%Y"],
         )
 
         assert result.exit_code == 0
@@ -256,7 +260,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --mode=(ingest|schema_only|append)
+            tiledb convert_from [csv_file] [uri] --mode (ingest|schema_only|append)
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -270,8 +274,10 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=True",
-                "--mode=schema_only",
+                "--sparse",
+                "True",
+                "--mode",
+                "schema_only",
             ],
         )
 
@@ -284,7 +290,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --row-start-idx=<int>
+            tiledb convert_from [csv_file] [uri] --row-start-idx <int>
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -298,8 +304,10 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=False",
-                "--row-start-idx=5",
+                "--sparse",
+                "False",
+                "--row-start-idx",
+                "5",
             ],
         )
 
@@ -313,7 +321,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --cell-order=(row-major|col-major|global)
+            tiledb convert_from [csv_file] [uri] --cell-order (row-major|col-major|global)
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -322,7 +330,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--cell-order=col-major"],
+            ["convert-from", "csv", input_path, uri, "--cell-order", "col-major"],
         )
 
         assert result.exit_code == 0
@@ -334,7 +342,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --tile=<int>
+            tiledb convert_from [csv_file] [uri] --tile <int>
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -343,7 +351,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--tile=2"],
+            ["convert-from", "csv", input_path, uri, "--tile", "2"],
         )
 
         assert result.exit_code == 0
@@ -355,7 +363,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --tile=<attr>:<int>
+            tiledb convert_from [csv_file] [uri] --tile <attr>:<int>,...
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -364,7 +372,7 @@ class TestCSV:
         runner = CliRunner()
         result = runner.invoke(
             root,
-            ["convert-from", "csv", input_path, uri, "--tile=__tiledb_rows:2"],
+            ["convert-from", "csv", input_path, uri, "--tile", "__tiledb_rows:2"],
         )
 
         assert result.exit_code == 0
@@ -376,7 +384,7 @@ class TestCSV:
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] --timestamp=<int>
+            tiledb convert_from [csv_file] [uri] --timestamp <int>
         """
         test_name, expected_output = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -391,9 +399,12 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=True",
-                "--mode=ingest",
-                "--timestamp=1",
+                "--sparse",
+                "True",
+                "--mode",
+                "ingest",
+                "--timestamp",
+                "1",
             ],
         )
 
@@ -406,9 +417,12 @@ class TestCSV:
                 "csv",
                 input_path,
                 uri,
-                "--sparse=True",
-                "--mode=append",
-                "--timestamp=2",
+                "--sparse",
+                "True",
+                "--mode",
+                "append",
+                "--timestamp",
+                "2",
             ],
         )
 
@@ -547,78 +561,72 @@ class TestCSV:
             assert array.schema.domain.dim(0).filters.nfilters == 1
             assert array.schema.domain.dim(0).filters[0] == tiledb.GzipFilter(9)
 
-    # # @pytest.mark.skip(reason="TODO implement full test")
-    # def test_sep(self, temp_rootdir, create_test_simple_csv):
-    #     """
-    #     Test for command
+    # @pytest.mark.skip(reason="TODO implement full test")
+    def test_sep(self, temp_rootdir, create_test_simple_csv):
+        """
+        Test for command
 
-    #         tiledb convert_from [csv_file] [uri] -s <str>
-    #     """
-    #     test_name, _ = create_test_simple_csv
-    #     input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
-    #     uri = os.path.join(temp_rootdir, "test_sep.tdb")
+            tiledb convert_from [csv_file] [uri] --sep <str>
+        """
+        test_name, _ = create_test_simple_csv
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_sep.tdb")
 
-    #     runner = CliRunner()
-    #     result = runner.invoke(
-    #         root, ["convert-from", "csv", input_path, uri, "--sep=a"]
-    #     )
+        runner = CliRunner()
+        result = runner.invoke(
+            root, ["convert-from", "csv", input_path, uri, "--sep", " "]
+        )
 
-    #     assert result.exit_code == 0
-    #     with tiledb.open(uri) as array:
-    #         print(array.df[:])
+        assert result.exit_code == 0
+        with tiledb.open(uri) as array:
+            print(array.df[:])
 
     # @pytest.mark.skip("TODO implement full test")
-    # def test_header(self, temp_rootdir, create_test_simple_csv):
-    #     """
-    #     Test for command
+    def test_header(self, temp_rootdir, create_test_simple_csv):
+        """
+        Test for command
 
-    #         tiledb convert_from [csv_file] [uri] -h <int>
-    #     """
-    #     test_name, _ = create_test_simple_csv
-    #     input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
-    #     uri = os.path.join(temp_rootdir, "test_header.tdb")
+            tiledb convert_from [csv_file] [uri] -h <int>
+        """
+        test_name, _ = create_test_simple_csv
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_header.tdb")
 
-    #     runner = CliRunner()
-    #     result = runner.invoke(
-    #         root, ["convert-from", "csv", input_path, uri, "--header=2"]
-    #     )
+        runner = CliRunner()
+        result = runner.invoke(
+            root, ["convert-from", "csv", input_path, uri, "--header", "2"]
+        )
 
-    #     assert result.exit_code == 0
-    #     with tiledb.open(uri) as array:
-    #         print(array.df[:])
+        assert result.exit_code == 0
+        with tiledb.open(uri) as array:
+            print(array.df[:])
 
-    # # @pytest.mark.skip("TODO implement full test")
-    # def test_names(self, temp_rootdir, create_test_simple_csv):
-    #     """
-    #     Test for command
+    # @pytest.mark.skip("TODO implement full test")
+    def test_names(self, temp_rootdir, create_test_simple_csv):
+        """
+        Test for command
 
-    #         tiledb convert_from [csv_file] [uri] -N <column name>
-    #     """
-    #     test_name, _ = create_test_simple_csv
-    #     input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
-    #     uri = os.path.join(temp_rootdir, "test_names.tdb")
+            tiledb convert_from [csv_file] [uri] --names <column name>,...
+        """
+        test_name, _ = create_test_simple_csv
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_names.tdb")
 
-    #     runner = CliRunner()
-    #     result = runner.invoke(
-    #         root,
-    #         [
-    #             "convert-from",
-    #             "csv",
-    #             input_path,
-    #             uri,
-    #             "-h",
-    #             0,
-    #             "-N",
-    #             "d",
-    #             "-N",
-    #             "c",
-    #             "-N",
-    #             "b",
-    #             "-N",
-    #             "a",
-    #         ],
-    #     )
+        runner = CliRunner()
+        result = runner.invoke(
+            root,
+            [
+                "convert-from",
+                "csv",
+                input_path,
+                uri,
+                "--header",
+                "0",
+                "--names",
+                "d,c,b,a",
+            ],
+        )
 
-    #     assert result.exit_code == 0
-    #     with tiledb.open(uri) as array:
-    #         print(array.df[:])
+        assert result.exit_code == 0
+        with tiledb.open(uri) as array:
+            print(array.df[:])
