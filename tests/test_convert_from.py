@@ -456,6 +456,7 @@ class TestCSV:
             ["convert-from", "csv", input_path, uri, "--attr-filters", "GzipFilter=9"],
         )
 
+        print(result.stdout)
         assert result.exit_code == 0
 
         with tiledb.open(uri) as array:
@@ -490,12 +491,14 @@ class TestCSV:
                 input_path,
                 uri,
                 "--attr-filters",
-                "a:LZ4Filter=10,BitShuffleFilter",
-                "--attr-filters",
-                "b:DoubleDeltaFilter,PositiveDeltaFilter=3",
+                (
+                    "a:LZ4Filter=10,BitShuffleFilter;"
+                    "b:DoubleDeltaFilter,PositiveDeltaFilter=3"
+                ),
             ],
         )
 
+        print(result.stdout)
         assert result.exit_code == 0
 
         with tiledb.open(uri) as array:
@@ -534,6 +537,7 @@ class TestCSV:
             ],
         )
 
+        print(result.stdout)
         assert result.exit_code == 0
 
         with tiledb.open(uri) as array:
@@ -555,6 +559,7 @@ class TestCSV:
             root,
             ["convert-from", "csv", input_path, uri, "--dim-filters", "GzipFilter=9"],
         )
+        print(result.stdout)
         assert result.exit_code == 0
 
         with tiledb.open(uri) as array:
@@ -618,7 +623,7 @@ class TestCSV:
 
             tiledb convert_from [csv_file] [uri] --skiprows <int>,...
         """
-        test_name, expected_output = create_test_simple_csv
+        test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_skiprows.tdb")
 

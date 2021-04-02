@@ -14,16 +14,26 @@ class FilterList(click.ParamType):
     name = "filter_list"
 
     def convert(self, value, param, ctx):
-        values = str(value).split(":")
+        raw_filters = str(value).split(";")
 
+        if len(raw_filters) == 1:
+            return self.parse_filter_list(value, param, ctx)
+        else:
+            filters = dict()
+            for f in raw_filters:
+                filters.update(self.parse_filter_list(f, param, ctx))
+            return filters
+
+    def parse_filter_list(self, value, param, ctx):
+        values = str(value).split(":")
         if len(values) == 1:
-            return self.parse_filters(values[0], param, ctx)
+            return self._parse_single_attr(values[0], param, ctx)
         elif len(values) == 2:
-            return (values[0], self.parse_filters(values[1], param, ctx))
+            return {values[0]: self._parse_single_attr(values[1], param, ctx)}
         else:
             self.fail(f"Too many arguments provided", param, ctx)
 
-    def parse_filters(self, filter_and_options, param, ctx):
+    def _parse_single_attr(self, filter_and_options, param, ctx):
         filter_name_to_function = {
             "GzipFilter": tiledb.GzipFilter,
             "ZstdFilter": tiledb.ZstdFilter,
@@ -92,122 +102,102 @@ class FilterList(click.ParamType):
 @click.argument("uri")
 @click.option(
     "--attr-filters",
-    metavar="<filter name>,<filter name>,... | <attr name>:<filter name>,<filter name>,...",
+    metavar="<filter[=opt]>,... | <attr>:<filter[=opt]>;...",
     help=(
-        "Provide a comma separated list of filters to apply to each attribute. "
-        "Alternatively, assign filters to each attribute by passing the flag "
-        "multiple times (e.g. '-A attr_x:5 -A attr_y:8'). Unspecified dimensions "
-        "will use default."
+        "Provide a comma separated list of filters to apply to each attribute "
+        "(e.g. --attr-filters filter1,filter2=5,filter=3). Map an attribute with "
+        "a given list of filters with a colon separated by a semicolon "
+        "(e.g. --attr-filters attr1:filter1,filter2=4;attr2:filter1=0. Some filters "
+        "take in a compression level or window size that can be assigned using the "
+        "= operator as shown in the examples above."
     ),
-    multiple=True,
     type=FilterList(),
-    default=(),
 )
 @click.option(
     "--coords-filters",
-    metavar="<filter name>,<filter name>,...",
-    help=("Provide a comma separated list of filters to apply to each coordinate. "),
+    metavar="<filter[=opt]>,,...",
+    help=(
+        "Provide a comma separated list of filters to apply to each coordinate. "
+        "Some filters take in a compression level or window size that can be assigned "
+        "using the = operator."
+    ),
     type=FilterList(),
 )
 @click.option(
     "--dim-filters",
-    metavar="<filter name>,<filter name>,... | <attr name>:<filter name>,<filter name>,...",
+    metavar="<filter[=opt]>,... | <dim>:<filter[=opt]>;...",
     help=(
-        "Provide a comma separated list of filters to apply to each dimension. "
-        "Alternatively, assign filters to each dimension by passing the flag "
-        "multiple times (e.g. '-D attr_x:5 -D attr_y:8'). Unspecified dimensions "
-        "will use default."
+        "Provide a comma separated list of filters to apply to each dimension "
+        "(e.g. --dim-filters filter1,filter2=5,filter=3). Map a dimension with "
+        "a given list of filters with a colon separated by a semicolon "
+        "(e.g. --dim-filters dim1:filter1,filter2=4;dim2:filter1=0. Some filters "
+        "take in a compression level or window size that can be assigned using the "
+        "= operator as shown in the examples above."
     ),
-    multiple=True,
     type=FilterList(),
-    default=(),
 )
 @click.pass_context
 def csv(ctx, csv_file, uri, attr_filters, coords_filters, dim_filters):
     """
     Convert a csv_file into a TileDB array located at uri.
     """
-    kwargs = dict()
+    kwargs = parse_kwargs(ctx)
 
-    kwargslist = []
-    args_iter = iter(ctx.args)
-    for arg in args_iter:
-        dashedoption = arg
-        rhs = next(args_iter)
-
-        if dashedoption[:2] == "--":
-            opt = dashedoption[2:]
-        else:
-            raise click.UsageError(f"Saw ill-formed option {arg}.")
-
-        opt = opt.replace("-", "_")
-        rhsvalues = rhs.split(",")
-
-        for rhsval in rhsvalues:
-            k, sep, v = rhsval.partition(":")
-
-            if v:
-                kwargslist.append((opt, (k, v)))
-            else:
-                kwargslist.append((opt, k))
-
-    bool = {"True": True, "False": False}
-    kwargscol = collections.defaultdict(list)
-    for k, v in kwargslist:
-        if isinstance(v, tuple):
-            if v[1].isnumeric():
-                v = (v[0], int(v[1]))
-            elif v[1] in bool:
-                v = (v[0], bool[v[1]])
-            else:
-                v = (v[0], str(v[1]))
-        elif v.isnumeric():
-            v = int(v)
-        elif v in bool:
-            v = bool[v]
-        else:
-            v = str(v)
-        kwargscol[k].append(v)
-
-    kwargs = dict()
-    for k, v in kwargscol.items():
-        if len(v) > 0 and isinstance(v[0], tuple):
-            kwargs[k] = dict(v)
-        elif len(v) == 1:
-            kwargs[k] = v[0]
-        else:
-            kwargs[k] = v
-
+    # there are options that require special parsing that cannot be generally
+    # handled using the parse_kwargs() function above.
     if attr_filters:
-        if len(attr_filters) == 1:
-            attr_filters = attr_filters[0]
-        elif len(attr_filters) > 1:
-            if any(isinstance(t, tiledb.FilterList) for t in attr_filters):
-                raise click.BadOptionUsage(
-                    "The --attr_filters/-A flag can only be used once if using only "
-                    "<filter list> argument. Multiple uses of the flag require "
-                    "<attr name>:<filter list> arguments."
-                )
-            attr_filters = dict(attr_filters)
         kwargs["attr_filters"] = attr_filters
 
     if coords_filters:
         kwargs["coords_filters"] = coords_filters
 
     if dim_filters:
-        if len(dim_filters) == 1:
-            dim_filters = dim_filters[0]
-        elif len(dim_filters) > 1:
-            if any(isinstance(t, tiledb.FilterList) for t in dim_filters):
-                raise click.BadOptionUsage(
-                    "The --dim_filters/-D flag can only be used once if using only "
-                    "<filter list> argument. Multiple uses of the flag require "
-                    "<attr name>:<filter list> arguments."
-                )
-            dim_filters = dict(dim_filters)
         kwargs["dim_filters"] = dim_filters
 
     tiledb.from_csv(uri, csv_file, **kwargs)
+
+
+def parse_kwargs(ctx):
+    argslist = []
+
+    argsiter = iter(ctx.args)
+    for arg in argsiter:
+        lhs, rhs = arg, next(argsiter)
+
+        if lhs[:2] == "--":
+            opt = lhs[2:].replace("-", "_")
+        else:
+            raise click.UsageError(f"Saw ill-formed option {arg}.")
+
+        for values in rhs.split(","):
+            k, sep, v = values.partition(":")
+            argslist.append((opt, (k, v) if v else k))
+
+    kwargs = collections.defaultdict(list)
+    for k, v in argslist:
+        v = (
+            (v[0], cast_kwargs_value(v[1]))
+            if isinstance(v, tuple)
+            else cast_kwargs_value(v)
+        )
+        kwargs[k].append(v)
+
+    for k, v in kwargs.items():
+        if len(v) > 0 and isinstance(v[0], tuple):
+            kwargs[k] = dict(v)
+        elif len(v) == 1:
+            kwargs[k] = v[0]
+
+    return kwargs
+
+
+def cast_kwargs_value(v):
+    bool = {"True": True, "False": False}
+    if v.isnumeric():
+        v = int(v)
+    elif v in bool:
+        v = bool[v]
+    return v
 
 
 convert_from.add_command(csv)
