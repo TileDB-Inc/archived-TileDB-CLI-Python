@@ -561,7 +561,6 @@ class TestCSV:
             assert array.schema.domain.dim(0).filters.nfilters == 1
             assert array.schema.domain.dim(0).filters[0] == tiledb.GzipFilter(9)
 
-    # @pytest.mark.skip(reason="TODO implement full test")
     def test_sep(self, temp_rootdir, create_test_simple_csv):
         """
         Test for command
@@ -579,34 +578,13 @@ class TestCSV:
 
         assert result.exit_code == 0
         with tiledb.open(uri) as array:
-            print(array.df[:])
+            assert len(array.df[:].columns) == 1
 
-    # @pytest.mark.skip("TODO implement full test")
-    def test_header(self, temp_rootdir, create_test_simple_csv):
+    def test_header_and_names(self, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
-            tiledb convert_from [csv_file] [uri] -h <int>
-        """
-        test_name, _ = create_test_simple_csv
-        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
-        uri = os.path.join(temp_rootdir, "test_header.tdb")
-
-        runner = CliRunner()
-        result = runner.invoke(
-            root, ["convert-from", "csv", input_path, uri, "--header", "2"]
-        )
-
-        assert result.exit_code == 0
-        with tiledb.open(uri) as array:
-            print(array.df[:])
-
-    # @pytest.mark.skip("TODO implement full test")
-    def test_names(self, temp_rootdir, create_test_simple_csv):
-        """
-        Test for command
-
-            tiledb convert_from [csv_file] [uri] --names <column name>,...
+            tiledb convert_from [csv_file] [uri] --header 0 --names <column name>,...
         """
         test_name, _ = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
@@ -629,4 +607,27 @@ class TestCSV:
 
         assert result.exit_code == 0
         with tiledb.open(uri) as array:
-            print(array.df[:])
+            assert array.df[:].columns[0] == "d"
+            assert array.df[:].columns[1] == "c"
+            assert array.df[:].columns[2] == "b"
+            assert array.df[:].columns[3] == "a"
+
+    def test_skiprows(self, temp_rootdir, create_test_simple_csv):
+        """
+        Test for command
+
+            tiledb convert_from [csv_file] [uri] --skiprows <int>,...
+        """
+        test_name, expected_output = create_test_simple_csv
+        input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
+        uri = os.path.join(temp_rootdir, "test_skiprows.tdb")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            root,
+            ["convert-from", "csv", input_path, uri, "--skiprows", "0,1"],
+        )
+
+        assert result.exit_code == 0
+        with tiledb.open(uri) as array:
+            assert len(array.df[:]) == 3
