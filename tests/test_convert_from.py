@@ -1,5 +1,6 @@
 import tiledb
 from commands.root import root
+from commands.convert_from import parse_kwargs
 
 from click.testing import CliRunner
 import os
@@ -46,7 +47,56 @@ def create_test_simple_csv(temp_rootdir):
 
 
 class TestCSV:
-    def test(self, temp_rootdir, create_test_simple_csv):
+    def test_parse_kwargs(self):
+        class ctx:
+            args = None
+
+        ctx.args = [
+            "--bool",
+            "True",
+            "--str",
+            "helloworld",
+            "--num",
+            "2",
+            "--numisstr",
+            '"2"',
+            "--boolisstr",
+            '"False"',
+            "--dictints",
+            "hello:1,world:2",
+            "--dictstrs",
+            'hello:world,"1":"2"',
+            "--dictbools",
+            "good:True,bye:False",
+            "--dictmix",
+            'bool:False,str:"1",int:2,3:"three"',
+            "--listabc",
+            "a,b,c",
+            "--list123",
+            "1,2,3",
+            "--listbool",
+            "True,True,False",
+            "--listmix",
+            'False,"1",2',
+        ]
+
+        kwargs = parse_kwargs(ctx)
+
+        assert kwargs["bool"] == True
+        assert kwargs["str"] == "helloworld"
+        assert kwargs["num"] == 2
+        assert kwargs["numisstr"] == "2"
+        assert kwargs["boolisstr"] == "False"
+        assert kwargs["dictints"] == {"hello": 1, "world": 2}
+        assert kwargs["dictstrs"] == {"hello": "world", "1": "2"}
+        assert kwargs["dictbools"] == {"good": True, "bye": False}
+        assert kwargs["dictmix"] == {"bool": False, "str": "1", "int": 2, 3: "three"}
+        assert kwargs["listabc"] == ["a", "b", "c"]
+        assert kwargs["list123"] == [1, 2, 3]
+        assert kwargs["listbool"] == [True, True, False]
+        assert kwargs["listmix"] == [False, "1", 2]
+
+    def test_no_options(self, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 

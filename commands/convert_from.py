@@ -21,6 +21,12 @@ class FilterList(click.ParamType):
         else:
             filters = dict()
             for f in raw_filters:
+                if ":" not in f:
+                    self.fail(
+                        f"An attribute:FilterList mapping must be provided if using ; syntax.",
+                        param,
+                        ctx,
+                    )
                 filters.update(self.parse_filter_list(f, param, ctx))
             return filters
 
@@ -176,9 +182,9 @@ def parse_kwargs(ctx):
     kwargs = collections.defaultdict(list)
     for k, v in argslist:
         v = (
-            (v[0], cast_kwargs_value(v[1]))
+            (cast_kwargs(v[0], checkbool=False), cast_kwargs(v[1]))
             if isinstance(v, tuple)
-            else cast_kwargs_value(v)
+            else cast_kwargs(v)
         )
         kwargs[k].append(v)
 
@@ -191,12 +197,15 @@ def parse_kwargs(ctx):
     return kwargs
 
 
-def cast_kwargs_value(v):
+def cast_kwargs(v, checkbool=True):
     bool = {"True": True, "False": False}
     if v.isnumeric():
         v = int(v)
-    elif v in bool:
+    elif checkbool and v in bool:
         v = bool[v]
+    elif v[0] == '"' and v[-1] == '"':
+        v = v[1:-1]
+
     return v
 
 
