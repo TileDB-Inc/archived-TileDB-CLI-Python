@@ -175,7 +175,7 @@ def parse_kwargs(ctx):
         else:
             raise click.UsageError(f"Saw ill-formed option {arg}.")
 
-        for values in rhs.split(","):
+        for values in rhs.split(";"):
             k, sep, v = values.partition(":")
             argslist.append((opt, (k, v) if v else k))
 
@@ -199,14 +199,20 @@ def parse_kwargs(ctx):
 
 def cast_kwargs(v, checkbool=True):
     bool = {"True": True, "False": False}
-    if v.isnumeric():
+    if "," in v and not isstring(v):
+        v = [cast_kwargs(val, checkbool=checkbool) for val in v.split(",")]
+    elif v.isnumeric():
         v = int(v)
     elif checkbool and v in bool:
         v = bool[v]
-    elif v[0] == '"' and v[-1] == '"':
+    elif isstring(v):
         v = v[1:-1]
 
     return v
+
+
+def isstring(v):
+    return v[0] == '"' and v[-1] == '"'
 
 
 convert_from.add_command(csv)

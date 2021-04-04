@@ -63,13 +63,13 @@ class TestCSV:
             "--boolisstr",
             '"False"',
             "--dictints",
-            "hello:1,world:2",
+            "hello:1;world:2",
             "--dictstrs",
-            'hello:world,"1":"2"',
+            'hello:world;"1":"2"',
             "--dictbools",
-            "good:True,bye:False",
+            "good:True;bye:False",
             "--dictmix",
-            'bool:False,str:"1",int:2,3:"three"',
+            'bool:False;str:"1";int:2;3:"three";list:hey,"hi",True,1',
             "--listabc",
             "a,b,c",
             "--list123",
@@ -90,7 +90,13 @@ class TestCSV:
         assert kwargs["dictints"] == {"hello": 1, "world": 2}
         assert kwargs["dictstrs"] == {"hello": "world", "1": "2"}
         assert kwargs["dictbools"] == {"good": True, "bye": False}
-        assert kwargs["dictmix"] == {"bool": False, "str": "1", "int": 2, 3: "three"}
+        assert kwargs["dictmix"] == {
+            "bool": False,
+            "str": "1",
+            "int": 2,
+            3: "three",
+            "list": ["hey", "hi", True, 1],
+        }
         assert kwargs["listabc"] == ["a", "b", "c"]
         assert kwargs["list123"] == [1, 2, 3]
         assert kwargs["listbool"] == [True, True, False]
