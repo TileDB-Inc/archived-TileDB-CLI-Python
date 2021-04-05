@@ -76,11 +76,19 @@ def schema(uri):
     type=int,
     default=(1, 5),
 )
-def array(uri, attribute, rows):
+@click.option(
+    "--timestamp",
+    "-t",
+    metavar="<unix seconds>",
+    help=("Output data from the array at the given TileDB timestamp."),
+    type=int,
+    default=None,
+)
+def array(uri, attribute, rows, timestamp):
     """
     Output the data of a TileDB array located at uri.
     """
-    with tiledb.open(uri) as array:
+    with tiledb.open(uri, timestamp=timestamp) as array:
         pp = pprint.PrettyPrinter()
 
         if rows[0] <= 0 or rows[1] <= 0:

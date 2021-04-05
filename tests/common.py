@@ -95,10 +95,10 @@ def create_test_array_dense_25x12_mult(temp_rootdir):
 
     data = np.reshape(np.arange(300), (25, 12))
 
-    with tiledb.DenseArray(path, mode="w") as A:
+    with tiledb.DenseArray(path, mode="w", timestamp=1) as A:
         A[:] = {"a": data, "b": data}
 
-    with tiledb.DenseArray(path, mode="w") as A:
+    with tiledb.DenseArray(path, mode="w", timestamp=2) as A:
         A[:] = {"a": data / 2, "b": data * 2}
 
 
@@ -147,8 +147,8 @@ def create_test_array_sparse_25x12_mult(temp_rootdir):
     cols = coords[:, 1]
     data = np.arange(300)
 
-    with tiledb.SparseArray(path, mode="w") as A:
+    with tiledb.SparseArray(path, mode="w", timestamp=1) as A:
         A[rows, cols] = {"a": data, "b": data}
 
-    with tiledb.SparseArray(path, mode="w") as A:
+    with tiledb.SparseArray(path, mode="w", timestamp=2) as A:
         A[rows, cols] = {"a": data / 2, "b": data * 2}

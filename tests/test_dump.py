@@ -308,6 +308,68 @@ class TestArray:
         raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
         assert len(raw_array) == 1
 
+        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
+        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
+            resulting_row = list(map(float, raw_a_dim_row.split(",")))
+            expected_row = list(
+                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
+            )
+            assert resulting_row == expected_row
+
+        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
+        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
+            resulting_row = list(map(float, raw_b_dim_row.split(",")))
+            expected_row = list(
+                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
+            )
+            assert resulting_row == expected_row
+
+    @pytest.mark.parametrize("array_name", ["dense_25x12_mult", "sparse_25x12_mult"])
+    def test_timestamp(self, temp_rootdir, array_name):
+        """
+        Test for command
+
+            tiledb dump array [array_uri] -t <unix seconds>
+        """
+        uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
+
+        runner = CliRunner()
+
+        # check at timestamp=1
+        result = runner.invoke(root, ["dump", "array", uri, "-t", 1])
+        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
+        assert len(raw_array) == 1
+
+        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
+        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
+            resulting_row = list(map(float, raw_a_dim_row.split(",")))
+            expected_row = list(
+                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
+            )
+            assert resulting_row == expected_row
+
+        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
+        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
+            resulting_row = list(map(float, raw_b_dim_row.split(",")))
+            expected_row = list(
+                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
+            )
+            assert resulting_row == expected_row
+
+        # check at timestamp=2
+        result = runner.invoke(root, ["dump", "array", uri, "-t", 2])
+
+        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
+        assert len(raw_array) == 1
+
+        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
+        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
+            resulting_row = list(map(float, raw_a_dim_row.split(",")))
+            expected_row = list(
+                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
+            )
+            assert resulting_row == expected_row
+
         raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
         for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
             resulting_row = list(map(float, raw_b_dim_row.split(",")))
