@@ -335,7 +335,66 @@ def orgs(async_req, name, property_):
             )
 
 
+@click.command()
+@click.option(
+    "--async-req/--no-async-req",
+    help=("Return future instead of results for async support"),
+    default=False,
+    show_default=True,
+)
+@click.option(
+    "--property",
+    "-P",
+    "property_",
+    help=(
+        "By default, output all properties from the user profile. Pass the flag "
+        "multiple times to retrieve multiple properties. "
+        "Example: tiledb dump profile -P company -P email"
+    ),
+    type=click.Choice(
+        [
+            "id",
+            "username",
+            "password",
+            "name",
+            "email",
+            "is_valid_email",
+            "stripe_connect",
+            "company",
+            "logo",
+            "last_activity_date",
+            "timezone",
+            "organizations",
+            "allowed_actions",
+            "enabled_features",
+            "unpaid_subscription",
+            "default_s3_path",
+            "default_s3_path_credentials_name",
+            "default_namespace_charged",
+        ]
+    ),
+    multiple=True,
+    default=(),
+)
+def profile(async_req, property_):
+    """
+    Output the current logged in namespace's profile information.
+    """
+    whole_profile = tiledb.cloud.client.user_profile(async_req=async_req)
+
+    if not property_:
+        click.echo(whole_profile)
+    else:
+        pp = pprint.PrettyPrinter()
+        click.echo(
+            pp.pformat(
+                {k: v for k, v in whole_profile.to_dict().items() if k in property_}
+            )
+        )
+
+
 cloud.add_command(login)
 cloud.add_command(dump)
 dump.add_command(arrays)
 dump.add_command(orgs)
+dump.add_command(profile)
