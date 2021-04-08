@@ -17,7 +17,7 @@ def dump():
 
 
 @click.group()
-def retry():
+def array():
     pass
 
 
@@ -546,7 +546,7 @@ def dump_task(property_, array, cost, duration, last, namespace, status, start, 
                 click.echo(pp.pformat({k: v for k, v in t.items() if k in property_}))
 
 
-@click.command(name="task")
+@click.command()
 @click.argument("id")
 def retry_task(id):
     """
@@ -556,8 +556,109 @@ def retry_task(id):
 
 
 @click.command()
-def settings():
-    pass
+@click.argument("uri")
+@click.option(
+    "--namespace",
+    "-N",
+    type=str,
+    metavar="<username or organization>",
+    help=(
+        "Username or organization array should be registered under. Defaults to the user"
+    ),
+    default=None,
+)
+@click.option(
+    "--array-name",
+    "-n",
+    type=str,
+    metavar="<str>",
+    help=("Name of array"),
+    default=None,
+)
+@click.option(
+    "--description",
+    "-d",
+    type=str,
+    metavar="<str>",
+    help=("Description of array"),
+    default=None,
+)
+@click.option(
+    "--credentials",
+    "-c",
+    "access_credentials_name",
+    type=str,
+    metavar="<str>",
+    help=(
+        "Name of access credentials to use. Defaults to the default for given "
+        "namespace as set on TileDB cloud"
+    ),
+    default=None,
+)
+def register(uri, namespace, array_name, description, access_credentials_name):
+    """
+    Register an array located at uri to the TileDB cloud service.
+    """
+    click.echo(tiledb.cloud.register_array(uri, **locals()))
+
+
+@click.command()
+@click.argument("uri")
+@click.option(
+    "--namespace",
+    "-N",
+    type=str,
+    metavar="<username or organization>",
+    help=(
+        "Username or organization array should be registered under. Defaults to the user"
+    ),
+    default=None,
+)
+def deregister(uri):
+    """
+    Deregister an array located at uri to the TileDB cloud service. This does not
+    physically delete the array. It will remain in your bucket. All access to the
+    array and could metadata will be removed.
+    """
+    click.echo(tiledb.cloud.deregister_array(uri))
+
+
+@click.command()
+@click.argument("uri")
+@click.argument("namespace")
+@click.option(
+    "--read", "-r", help=("Give namespace read permissions to array"), is_flag=True
+)
+@click.option(
+    "--write", "-w", help=("Give namespace write permissions to array"), is_flag=True
+)
+def share(uri, namespace, read, write):
+    """
+    Share the TileDB array located at uri to the user at a given namespace. At least
+    one of the persmission flags must be supplied.
+    """
+    permissions = []
+
+    if read:
+        permissions.append("read")
+
+    if write:
+        permissions.append("write")
+
+    if not permissions:
+        raise click.UsageError(f"You must supply one or more persmission flags.")
+
+    tiledb.cloud.share_array(uri, namespace, permissions)
+
+
+@click.command()
+@click.argument("uri")
+@click.argument("namespace")
+def unshare(uri, namespace):
+    """
+    Revokes access to a TileDB array located at uri for the user at a given namespace.
+    """
+    tiledb.cloud.unshare_array(uri, namespace)
 
 
 cloud.add_command(login)
@@ -569,6 +670,10 @@ dump.add_command(profile)
 dump.add_command(activity)
 dump.add_command(dump_task)
 
-cloud.add_command(retry)
-retry.add_command(retry_task)
-retry.add_command(settings)
+cloud.add_command(retry_task)
+
+cloud.add_command(array)
+array.add_command(register)
+array.add_command(deregister)
+array.add_command(share)
+array.add_command(unshare)
