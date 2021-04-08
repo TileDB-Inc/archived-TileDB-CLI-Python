@@ -16,6 +16,11 @@ def dump():
     pass
 
 
+@click.group()
+def retry():
+    pass
+
+
 def PromptPasswordIfUsername():
     """
     Referenced from answer here: https://stackoverflow.com/a/49603426
@@ -147,22 +152,16 @@ def login(credential, token, password, host, verify_ssl, no_session, threads):
 @click.option(
     "--page",
     "-p",
-    metavar="<str>",
+    metavar="<int>",
     help=("Optional page for pagination"),
     default=None,
 )
 @click.option(
     "--per-page",
     "-n",
-    metavar="<str>",
+    metavar="<int>",
     help=("Optional per_page for pagination"),
     default=None,
-)
-@click.option(
-    "--async-req/--no-async-req",
-    help=("Return future instead of results for async support"),
-    default=False,
-    show_default=True,
 )
 @click.option(
     "--type",
@@ -230,7 +229,6 @@ def arrays(
     exclude_file_type,
     page,
     per_page,
-    async_req,
     type_,
     property_,
 ):
@@ -245,11 +243,11 @@ def arrays(
     del kwargs["property_"]
 
     if type_ == "owned":
-        array_browser_data = tiledb.cloud.client.list_arrays(**kwargs)
+        array_browser_data = tiledb.cloud.list_arrays(**kwargs)
     elif type_ == "public":
-        array_browser_data = tiledb.cloud.client.list_public_arrays(**kwargs)
+        array_browser_data = tiledb.cloud.list_public_arrays(**kwargs)
     elif type_ == "shared":
-        array_browser_data = tiledb.cloud.client.list_shared_arrays(**kwargs)
+        array_browser_data = tiledb.cloud.list_shared_arrays(**kwargs)
 
     all_arrays = array_browser_data.to_dict()["arrays"]
 
@@ -263,12 +261,6 @@ def arrays(
 
 
 @click.command()
-@click.option(
-    "--async-req/--no-async-req",
-    help=("Return future instead of results for async support"),
-    default=False,
-    show_default=True,
-)
 @click.option(
     "--name",
     "-n",
@@ -313,16 +305,19 @@ def arrays(
     multiple=True,
     default=(),
 )
-def orgs(async_req, name, property_):
+def orgs(name, property_):
     """
     List organization properties and their associated values for each
     organization a TileDB user account is a part of.
     """
     if not name:
-        all_orgs = tiledb.cloud.client.organizations(async_req=async_req)
+        all_orgs = tiledb.cloud.client.organizations()
     else:
         all_orgs = [
-            tiledb.cloud.client.organization(n, async_req=async_req) for n in name
+            tiledb.cloud.client.organization(
+                n,
+            )
+            for n in name
         ]
 
     if not property_:
@@ -336,12 +331,6 @@ def orgs(async_req, name, property_):
 
 
 @click.command()
-@click.option(
-    "--async-req/--no-async-req",
-    help=("Return future instead of results for async support"),
-    default=False,
-    show_default=True,
-)
 @click.option(
     "--property",
     "-P",
@@ -376,11 +365,11 @@ def orgs(async_req, name, property_):
     multiple=True,
     default=(),
 )
-def profile(async_req, property_):
+def profile(property_):
     """
     Output the current logged in namespace's profile information.
     """
-    whole_profile = tiledb.cloud.client.user_profile(async_req=async_req)
+    whole_profile = tiledb.cloud.client.user_profile()
 
     if not property_:
         click.echo(whole_profile)
@@ -393,8 +382,193 @@ def profile(async_req, property_):
         )
 
 
+@click.command()
+@click.argument("uri")
+@click.option(
+    "--last",
+    "-n",
+    type=int,
+    metavar="<int>",
+    help=("Limit output to the given number of activities"),
+    default=5,
+    show_default=True,
+)
+def activity(uri, last):
+    """
+    Dump the array activity of an array located at a TileDB uri.
+    """
+    activity = tiledb.cloud.array_activity(uri)
+
+    pp = pprint.PrettyPrinter()
+    click.echo(pp.pformat(activity[:last]))
+
+
+@click.command(name="task")
+@click.option(
+    "--last",
+    "-n",
+    type=int,
+    metavar="<int>",
+    help=("Extend output to the given number of tasks"),
+    default=1,
+    show_default=True,
+)
+@click.option(
+    "--namespace",
+    "-N",
+    type=str,
+    metavar="<str>",
+    help=("Filter tasks by namespace"),
+    default=None,
+)
+@click.option(
+    "--status",
+    "-S",
+    help=("Filter tasks by status"),
+    type=click.Choice(["FAILED", "RUNNING", "COMPLETED"], case_sensitive=False),
+    default=None,
+)
+@click.option(
+    "--uri",
+    "-u",
+    "array",
+    type=str,
+    metavar="<str>",
+    help=("Filter tasks by array at uri"),
+    default=None,
+)
+@click.option(
+    "--time-start",
+    "-s",
+    "start",
+    type=int,
+    metavar="<int>",
+    help=("Upper range of time period to filter"),
+    default=None,
+)
+@click.option(
+    "--time-end",
+    "-e",
+    "end",
+    type=int,
+    metavar="<int>",
+    help=("Lower range of time period to filter"),
+    default=None,
+)
+@click.option(
+    "--property",
+    "-P",
+    "property_",
+    help=(
+        "By default, output all properties from the task. Pass the flag "
+        "multiple times to retrieve multiple properties. Pass none to not "
+        "retrieve any properties. This might be useful if you're using one of "
+        "the accumulator flags like --cost or --duration and only care about "
+        "your total. Passing none will ignore all other passed in properties.\n"
+        "Example 1: tiledb cloud dump tasks -P name -P subarray -P start_time\n"
+        "Example 2: tiledb cloud dump tasks -c -P none"
+    ),
+    type=click.Choice(
+        [
+            "id",
+            "name",
+            "description",
+            "array_metadata",
+            "subarray",
+            "memory",
+            "cpu",
+            "namespace",
+            "status",
+            "start_time",
+            "finish_time",
+            "cost",
+            "egress_cost",
+            "access_cost",
+            "query_type",
+            "udf_code",
+            "udf_language",
+            "sql_query",
+            "type",
+            "activity",
+            "logs",
+            "duration",
+            "sql_init_commands",
+            "sql_parameters",
+            "none",
+        ]
+    ),
+    multiple=True,
+    default=(),
+)
+@click.option(
+    "--cost",
+    "-c",
+    help=("Get the accumulated cost for all retrieved tasks."),
+    is_flag=True,
+)
+@click.option(
+    "--duration",
+    "-d",
+    help=("Get the accumulated duration time for all retrieved tasks."),
+    is_flag=True,
+)
+def dump_task(property_, array, cost, duration, last, namespace, status, start, end):
+    """
+    List last task from TileDB cloud.
+    """
+    kwargs = locals()
+
+    del kwargs["cost"]
+    del kwargs["duration"]
+    del kwargs["last"]
+    del kwargs["property_"]
+
+    if kwargs["status"]:
+        kwargs["status"].upper()
+
+    tasks = tiledb.cloud.tasks(**kwargs, page=1, per_page=last).to_dict()["array_tasks"]
+
+    if cost:
+        click.echo(f"Accumulated cost: {sum([t['cost'] for t in tasks])}")
+
+    if duration:
+        click.echo(f"Accumulated duration: {sum([t['duration'] for t in tasks])}")
+
+    if "none" not in property_:
+        pp = pprint.PrettyPrinter()
+        if not property_:
+            click.echo(pp.pformat(tasks))
+        else:
+            if cost and "cost" not in property_:
+                property_.append("cost")
+
+            for t in tasks:
+                click.echo(pp.pformat({k: v for k, v in t.items() if k in property_}))
+
+
+@click.command(name="task")
+@click.argument("id")
+def retry_task(id):
+    """
+    Retry running the task with the given id.
+    """
+    click.echo(tiledb.cloud.retry_task(id))
+
+
+@click.command()
+def settings():
+    pass
+
+
 cloud.add_command(login)
+
 cloud.add_command(dump)
 dump.add_command(arrays)
 dump.add_command(orgs)
 dump.add_command(profile)
+dump.add_command(activity)
+dump.add_command(dump_task)
+
+cloud.add_command(retry)
+retry.add_command(retry_task)
+retry.add_command(settings)
