@@ -1,5 +1,6 @@
 import tiledb
 
+from click.testing import CliRunner
 import numpy as np
 import itertools
 import pprint
@@ -15,6 +16,11 @@ test_array_names = [
     "sparse_25x12",
     "sparse_25x12_mult",
 ]
+
+
+@pytest.fixture(scope="session")
+def runner():
+    return CliRunner()
 
 
 @pytest.fixture(scope="session")

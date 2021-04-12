@@ -52,8 +52,11 @@ jobs:
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
     - name: 'Run tests'
-      run: pytest -vs
+      run: |
+        pytest -vs
       shell: bash
+      env:
+        TILEDB_REST_TOKEN: ${{ secrets.TILEDB_REST_TOKEN }}
 
     - name: 'Print log files (failed build only)'
       run: |

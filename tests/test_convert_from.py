@@ -99,7 +99,7 @@ class TestCSV:
         assert kwargs["listbool"] == [True, True, False]
         assert kwargs["listmix"] == [False, "1", 2]
 
-    def test_no_options(self, temp_rootdir, create_test_simple_csv):
+    def test_no_options(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -109,7 +109,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -125,7 +124,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert pd.DataFrame.equals(array.df[:], expected_output)
 
-    def test_sparse(self, temp_rootdir, create_test_simple_csv):
+    def test_sparse(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -135,7 +134,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_sparse.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--sparse", "True"],
@@ -146,7 +144,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.sparse == True
 
-    def test_dense(self, temp_rootdir, create_test_simple_csv):
+    def test_dense(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -156,7 +154,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_dense.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--sparse", "False"],
@@ -167,7 +164,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.sparse == False
 
-    def test_duplicates(self, temp_rootdir, create_test_simple_csv):
+    def test_duplicates(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -178,7 +175,6 @@ class TestCSV:
 
         uri = os.path.join(temp_rootdir, "test_no_duplicates.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -200,7 +196,6 @@ class TestCSV:
 
         uri = os.path.join(temp_rootdir, "test_allows_duplicates.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -220,7 +215,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.allows_duplicates == True
 
-    def test_capacity(self, temp_rootdir, create_test_simple_csv):
+    def test_capacity(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -230,7 +225,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_capacity.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--capacity", "123456"],
@@ -241,7 +235,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.capacity == 123456
 
-    def test_cell_order(self, temp_rootdir, create_test_simple_csv):
+    def test_cell_order(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -251,7 +245,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_cell_order.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--cell-order", "global"],
@@ -262,7 +255,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.cell_order == "global"
 
-    def test_full_domain(self, temp_rootdir, create_test_simple_csv):
+    def test_full_domain(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -272,7 +265,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_full_domain.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--full-domain", "True"],
@@ -285,7 +277,7 @@ class TestCSV:
             assert dim.domain[0] == np.iinfo(np.uint64).min
             assert dim.domain[1] == np.iinfo(np.uint64).max - dim.tile
 
-    def test_date_spec(self, temp_rootdir, create_test_simple_csv):
+    def test_date_spec(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -295,7 +287,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_date_spec.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--date-spec", "date:%b/%d/%Y"],
@@ -309,7 +300,7 @@ class TestCSV:
                 pd.DataFrame(pd.to_datetime(expected_output["date"])),
             )
 
-    def test_mode_schema_only(self, temp_rootdir, create_test_simple_csv):
+    def test_mode_schema_only(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -319,7 +310,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_mode_schema_only.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -339,7 +329,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.query(use_arrow=False).df[0].empty
 
-    def test_row_start_idx(self, temp_rootdir, create_test_simple_csv):
+    def test_row_start_idx(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -349,7 +339,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_row_start_idx.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -370,7 +359,7 @@ class TestCSV:
             assert array.df[:].index.to_numpy()[0] == 5
             assert array.df[:].index.to_numpy()[-1] == 9
 
-    def test_cell_order(self, temp_rootdir, create_test_simple_csv):
+    def test_cell_order(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -380,7 +369,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_cell_order.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--cell-order", "col-major"],
@@ -391,7 +379,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.cell_order == "col-major"
 
-    def test_tile_int(self, temp_rootdir, create_test_simple_csv):
+    def test_tile_int(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -401,7 +389,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_tile_int.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--tile", "2"],
@@ -412,7 +399,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.domain.dim("__tiledb_rows").tile == 2
 
-    def test_tile_with_attr(self, temp_rootdir, create_test_simple_csv):
+    def test_tile_with_attr(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -422,7 +409,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_tile_with_attr.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--tile", "__tiledb_rows:2"],
@@ -433,7 +419,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert array.schema.domain.dim("__tiledb_rows").tile == 2
 
-    def test_timestamp(self, temp_rootdir, create_test_simple_csv):
+    def test_timestamp(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -442,8 +428,6 @@ class TestCSV:
         test_name, expected_output = create_test_simple_csv
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_timestamp.tdb")
-
-        runner = CliRunner()
 
         result = runner.invoke(
             root,
@@ -493,7 +477,7 @@ class TestCSV:
                 expected_output.append(expected_output, ignore_index=True),
             )
 
-    def test_attr_filters(self, temp_rootdir, create_test_simple_csv):
+    def test_attr_filters(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -503,7 +487,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_attr_filters.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--attr-filters", "GzipFilter=9"],
@@ -525,7 +508,7 @@ class TestCSV:
             assert array.schema.attr("date").filters.nfilters == 1
             assert array.schema.attr("date").filters[0] == tiledb.GzipFilter(9)
 
-    def test_attr_filters_multi(self, temp_rootdir, create_test_simple_csv):
+    def test_attr_filters_multi(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -535,7 +518,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_attr_filters_multi.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -567,7 +549,7 @@ class TestCSV:
 
             assert array.schema.attr("date").filters.nfilters == 0
 
-    def test_coords_filters(self, temp_rootdir, create_test_simple_csv):
+    def test_coords_filters(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -577,7 +559,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_coords_filters.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -597,7 +578,7 @@ class TestCSV:
             assert array.schema.coords_filters.nfilters == 1
             assert array.schema.coords_filters[0] == tiledb.GzipFilter(9)
 
-    def test_dim_filters(self, temp_rootdir, create_test_simple_csv):
+    def test_dim_filters(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -607,7 +588,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_dim_filters.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--dim-filters", "GzipFilter=9"],
@@ -619,7 +599,7 @@ class TestCSV:
             assert array.schema.domain.dim(0).filters.nfilters == 1
             assert array.schema.domain.dim(0).filters[0] == tiledb.GzipFilter(9)
 
-    def test_sep(self, temp_rootdir, create_test_simple_csv):
+    def test_sep(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -629,7 +609,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_sep.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root, ["convert-from", "csv", input_path, uri, "--sep", " "]
         )
@@ -638,7 +617,7 @@ class TestCSV:
         with tiledb.open(uri) as array:
             assert len(array.df[:].columns) == 1
 
-    def test_header_and_names(self, temp_rootdir, create_test_simple_csv):
+    def test_header_and_names(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -648,7 +627,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_names.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             [
@@ -671,7 +649,7 @@ class TestCSV:
             assert array.df[:].columns[3] == "a"
 
     @pytest.mark.skip("does not work on windows?")
-    def test_skiprows(self, temp_rootdir, create_test_simple_csv):
+    def test_skiprows(self, runner, temp_rootdir, create_test_simple_csv):
         """
         Test for command
 
@@ -681,7 +659,6 @@ class TestCSV:
         input_path = os.path.join(temp_rootdir, f"{test_name}.csv")
         uri = os.path.join(temp_rootdir, "test_skiprows.tdb")
 
-        runner = CliRunner()
         result = runner.invoke(
             root,
             ["convert-from", "csv", input_path, uri, "--skiprows", "0,1"],

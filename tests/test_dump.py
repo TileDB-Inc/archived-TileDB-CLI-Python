@@ -1,5 +1,5 @@
 import tiledb
-from common import pp, test_array_names
+from common import test_array_names
 from commands.root import root
 
 import ast
@@ -11,13 +11,12 @@ import re
 
 
 class TestConfig:
-    def test(self):
+    def test(self, runner):
         """
         Test for command
 
             tiledb dump config
         """
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "config"])
         assert result.exit_code == 0
         assert result.stdout.split() == tiledb.Config().__repr__().split()
@@ -25,7 +24,7 @@ class TestConfig:
 
 class TestMetadata:
     @pytest.mark.parametrize("array_name", test_array_names)
-    def test(self, temp_rootdir, array_name, pp):
+    def test(self, runner, temp_rootdir, array_name, pp):
         """
         Test for command
 
@@ -33,7 +32,6 @@ class TestMetadata:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "metadata", uri])
         assert result.exit_code == 0
 
@@ -43,7 +41,7 @@ class TestMetadata:
 
 class TestNonemptyDomain:
     @pytest.mark.parametrize("array_name", test_array_names)
-    def test(self, temp_rootdir, array_name, pp):
+    def test(self, runner, temp_rootdir, array_name, pp):
         """
         Test for command
 
@@ -51,7 +49,6 @@ class TestNonemptyDomain:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "nonempty-domain", uri])
         assert result.exit_code == 0
 
@@ -61,7 +58,7 @@ class TestNonemptyDomain:
 
 class TestSchema:
     @pytest.mark.parametrize("array_name", test_array_names)
-    def test(self, temp_rootdir, array_name, pp):
+    def test(self, runner, temp_rootdir, array_name, pp):
         """
         Test for command
 
@@ -69,7 +66,6 @@ class TestSchema:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "schema", uri])
         assert result.exit_code == 0
 
@@ -78,7 +74,7 @@ class TestSchema:
 
 
 class TestArray:
-    def test_dense_25x12(self, temp_rootdir):
+    def test_dense_25x12(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -86,7 +82,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
@@ -100,7 +95,7 @@ class TestArray:
             resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
             assert resulting_row == list(range(row_idx * 12, (row_idx + 1) * 12))
 
-    def test_dense_25x12_rows(self, temp_rootdir):
+    def test_dense_25x12_rows(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -108,7 +103,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
         assert result.exit_code == 0
 
@@ -122,7 +116,7 @@ class TestArray:
             resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
             assert resulting_row == list(range(row_idx * 12, (row_idx + 1) * 12))
 
-    def test_dense_25x12x3(self, temp_rootdir):
+    def test_dense_25x12x3(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -130,7 +124,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12x3"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
@@ -146,7 +139,7 @@ class TestArray:
                 expected_row = idx_x * 36 + idx_y * 3
                 assert resulting_row == list(range(expected_row, expected_row + 3))
 
-    def test_dense_25x12x3_rows(self, temp_rootdir):
+    def test_dense_25x12x3_rows(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -154,7 +147,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12x3"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
         assert result.exit_code == 0
 
@@ -170,7 +162,7 @@ class TestArray:
                 expected_row = idx_x * 36 + idx_y * 3
                 assert resulting_row == list(range(expected_row, expected_row + 3))
 
-    def test_dense_25x12_mult(self, temp_rootdir):
+    def test_dense_25x12_mult(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -178,7 +170,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
@@ -201,7 +192,7 @@ class TestArray:
             )
             assert resulting_row == expected_row
 
-    def test_dense_25x12_mult_rows_attributes(self, temp_rootdir):
+    def test_dense_25x12_mult_rows_attributes(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -209,7 +200,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3", "-A", "b"])
         assert result.exit_code == 0
 
@@ -224,7 +214,7 @@ class TestArray:
             )
             assert resulting_row == expected_row
 
-    def test_sparse_25x12(self, temp_rootdir):
+    def test_sparse_25x12(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -232,7 +222,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
@@ -243,7 +232,7 @@ class TestArray:
         resulting_row = list(map(int, raw_resulting_array[0].split(",")))
         assert resulting_row == list(range(60))
 
-    def test_sparse_25x12_rows(self, temp_rootdir):
+    def test_sparse_25x12_rows(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -251,7 +240,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
         assert result.exit_code == 0
 
@@ -262,7 +250,7 @@ class TestArray:
         resulting_row = list(map(int, raw_resulting_array[0].split(",")))
         assert resulting_row == list(range(12, 36))
 
-    def test_sparse_25x12_mult(self, temp_rootdir):
+    def test_sparse_25x12_mult(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -270,7 +258,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri])
         assert result.exit_code == 0
 
@@ -293,7 +280,7 @@ class TestArray:
             )
             assert resulting_row == expected_row
 
-    def test_sparse_25x12_mult_rows_attributes(self, temp_rootdir):
+    def test_sparse_25x12_mult_rows_attributes(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -301,7 +288,6 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3", "-A", "b"])
         assert result.exit_code == 0
 
@@ -325,15 +311,13 @@ class TestArray:
             assert resulting_row == expected_row
 
     @pytest.mark.parametrize("array_name", ["dense_25x12_mult", "sparse_25x12_mult"])
-    def test_timestamp(self, temp_rootdir, array_name):
+    def test_timestamp(self, runner, temp_rootdir, array_name):
         """
         Test for command
 
             tiledb dump array [array_uri] -t <unix seconds>
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
-
-        runner = CliRunner()
 
         # check at timestamp=1
         result = runner.invoke(root, ["dump", "array", uri, "-t", 1])
@@ -381,7 +365,7 @@ class TestArray:
 
 class TestFragments:
     @pytest.mark.parametrize("array_name", ["dense_25x12_mult", "sparse_25x12_mult"])
-    def test_number(self, temp_rootdir, array_name):
+    def test_number(self, runner, temp_rootdir, array_name):
         """
         Test for command
 
@@ -389,13 +373,12 @@ class TestFragments:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "fragments", uri, "-n"])
         assert result.exit_code == 0
         assert result.stdout.strip() == "2"
 
     @pytest.mark.parametrize("array_name", ["dense_25x12_mult", "sparse_25x12_mult"])
-    def test_index(self, temp_rootdir, array_name):
+    def test_index(self, runner, temp_rootdir, array_name):
         """
         Test for command
 
@@ -403,7 +386,6 @@ class TestFragments:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "fragments", uri, "-i", "0"])
         assert result.exit_code == 0
         assert "'num': 0" in result.stdout
@@ -412,7 +394,7 @@ class TestFragments:
         assert result.exit_code == 0
         assert "'num': 1" in result.stdout
 
-    def test_dense_25x12_mult(self, temp_rootdir):
+    def test_dense_25x12_mult(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -420,7 +402,6 @@ class TestFragments:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "fragments", uri])
         assert result.exit_code == 0
 
@@ -437,7 +418,7 @@ class TestFragments:
         assert output["to_vacuum_uri"] == []
         assert output["unconsolidated_metadata_num"] == 2
 
-    def test_sparse_25x12_mult(self, temp_rootdir):
+    def test_sparse_25x12_mult(self, runner, temp_rootdir):
         """
         Test for command
 
@@ -445,7 +426,6 @@ class TestFragments:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12_mult"))
 
-        runner = CliRunner()
         result = runner.invoke(root, ["dump", "fragments", uri])
         assert result.exit_code == 0
 
