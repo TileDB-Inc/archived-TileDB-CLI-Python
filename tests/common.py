@@ -1,10 +1,10 @@
 import tiledb
 
 from click.testing import CliRunner
-import numpy as np
 import itertools
-import pprint
+import numpy as np
 import os
+import pprint
 import pytest
 import shutil
 import tempfile
