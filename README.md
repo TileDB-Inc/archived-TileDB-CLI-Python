@@ -15,3 +15,5 @@ For development mode, in the top level directory run:
 ```bash
 pip install .[dev]
 ```
+
+This will create `/usr/local/bin/tiledb`, which you can run.
