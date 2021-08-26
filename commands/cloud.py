@@ -399,7 +399,12 @@ def activity(uri, last):
     """
     activity = tiledb.cloud.array_activity(uri)
 
+    if activity is None:
+        click.echo("No recent activity.")
+        exit()
+
     pp = pprint.PrettyPrinter()
+    last = min(len(activity), last)
     click.echo(pp.pformat(activity[:last]))
 
 

@@ -55,7 +55,6 @@ class TestDump:
         uri = f"tiledb://{namespace}/{array_name}"
         result = runner.invoke(root, ["cloud", "dump", "activity", uri])
         assert result.exit_code == 0
-        print(result.stdout)
 
     def test_arrays(self, runner):
         """
