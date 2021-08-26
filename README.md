@@ -16,4 +16,4 @@ For development mode, in the top level directory run:
 pip install .[dev]
 ```
 
-This will create `/usr/local/bin/tiledb`, which you can run.
+This will create `tiledb` (in `/usr/local/bin`, or other paths specific to `venv` or `conda` if you are using those), which you can run.
