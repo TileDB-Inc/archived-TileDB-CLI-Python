@@ -412,7 +412,7 @@ class TestFragments:
         assert output["cell_num"] == (300, 300)
         assert output["dense"] == (True, True)
         assert output["has_consolidated_metadata"] == (False, False)
-        assert output["non_empty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
+        assert output["nonempty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
         assert output["sparse"] == (False, False)
         assert output["to_vacuum_num"] == 0
         assert output["to_vacuum_uri"] == []
@@ -436,7 +436,7 @@ class TestFragments:
         assert output["cell_num"] == (300, 300)
         assert output["dense"] == (False, False)
         assert output["has_consolidated_metadata"] == (False, False)
-        assert output["non_empty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
+        assert output["nonempty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
         assert output["sparse"] == (True, True)
         assert output["to_vacuum_num"] == 0
         assert output["to_vacuum_uri"] == []
