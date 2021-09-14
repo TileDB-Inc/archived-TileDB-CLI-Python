@@ -77,7 +77,7 @@ class TestDump:
             if idx % 2 == 1:
                 retrieved_array_names.append(elem[1:-2])
 
-        assert expected_array_names == retrieved_array_names
+        assert set(expected_array_names).issubset(set(retrieved_array_names))
 
     def test_orgs(self, runner):
         """

@@ -414,8 +414,7 @@ class TestFragments:
         assert output["has_consolidated_metadata"] == (False, False)
         assert output["nonempty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
         assert output["sparse"] == (False, False)
-        assert output["to_vacuum_num"] == 0
-        assert output["to_vacuum_uri"] == []
+        assert output["to_vacuum"] == ()
         assert output["unconsolidated_metadata_num"] == 2
 
     def test_sparse_25x12_mult(self, runner, temp_rootdir):
@@ -438,6 +437,5 @@ class TestFragments:
         assert output["has_consolidated_metadata"] == (False, False)
         assert output["nonempty_domain"] == (((1, 25), (1, 12)), ((1, 25), (1, 12)))
         assert output["sparse"] == (True, True)
-        assert output["to_vacuum_num"] == 0
-        assert output["to_vacuum_uri"] == []
+        assert output["to_vacuum"] == ()
         assert output["unconsolidated_metadata_num"] == 2
