@@ -1,6 +1,6 @@
 # TileDB-CLI
 
-TileDB-CLI is a heirachal CLI interface to the TileDB Storage Engine.
+TileDB-CLI is a hierarchical CLI interface to the TileDB Storage Engine.
 
 ## Installation
 
