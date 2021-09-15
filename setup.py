@@ -38,9 +38,6 @@ setup(
             "pybind11",
             "wheel",
             "setuptools-scm",
-            "dask",
-            "pandas ; python_version > '3.5'",
-            "pyarrow",
             "pytest",
         ]
     },
