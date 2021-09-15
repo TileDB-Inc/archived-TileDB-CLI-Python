@@ -25,9 +25,8 @@ setup(
     packages=["commands"],
     install_requires=[
         "click==7.1.2",
-        "numpy>=1.16.*",
         "setuptools",
-        "tiledb>=0.8.5",
+        "tiledb>=0.9",
         "tiledb-cloud>=0.7.10",
     ],
     extras_require={
