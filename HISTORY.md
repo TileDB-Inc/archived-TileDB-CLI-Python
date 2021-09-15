@@ -1,3 +1,8 @@
+# TileDB-CLI 0.0.2 Release Notes
+
+## Packaging Notes
+* Removed NumPy dependency and bumped minimum version of TileDB-Py to 0.9 [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
+
 # TileDB-CLI 0.0.1 Release Notes
 
 The initial release for the TileDB CLI. 🥳
