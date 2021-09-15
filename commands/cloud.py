@@ -8,6 +8,11 @@ import pprint
 
 @click.group()
 def cloud():
+    """
+    Perform TileDB Cloud tasks. For more information, see
+
+        https://tiledb.com/cloud
+    """
     pass
 
 

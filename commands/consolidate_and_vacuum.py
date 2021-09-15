@@ -6,7 +6,7 @@ import click
 @click.group()
 def consolidate():
     """
-    For more information, see
+    Consolidate TileDB array fragments. For more information, see
 
         https://docs.tiledb.com/main/solutions/tiledb-embedded/internal-mechanics/consolidation
     """
@@ -14,6 +14,11 @@ def consolidate():
 
 @click.group()
 def vacuum():
+    """
+    Vacuum TileDB array fragments that have already been consolidated. For more information, see
+
+        https://docs.tiledb.com/main/solutions/tiledb-embedded/internal-mechanics/consolidation#vacuuming
+    """
     pass
 
 

@@ -7,6 +7,9 @@ import pprint as pp
 
 @click.group()
 def convert_from():
+    """
+    Convert to and from TileDB arrays and other common file formats.
+    """
     pass
 
 

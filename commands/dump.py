@@ -6,6 +6,9 @@ import pprint
 
 @click.group()
 def dump():
+    """
+    Output information about TileDB arrays.
+    """
     pass
 
 
