@@ -1,10 +1,10 @@
 # TileDB-CLI
 
-TileDB-CLI is a hierarchical CLI interface to the TileDB Storage Engine.
+TileDB-CLI is a hierarchical command-line interface to the TileDB Storage Engine.
 
 ## Installation
 
-TileDB can be installed using `pip` with:
+TileDB-CLI can be installed using `pip` with:
 
 ```bash
 pip install tiledb-cli
