@@ -74,6 +74,127 @@ class TestSchema:
 
 
 class TestArray:
+    @pytest.mark.parametrize("sparse", [True, False])
+    @pytest.mark.parametrize(
+        "dtype",
+        [
+            np.int8,
+            np.uint8,
+            np.int16,
+            np.uint16,
+            np.int32,
+            np.uint32,
+            np.int64,
+            np.uint64,
+        ],
+    )
+    def test_int_dtypes(self, runner, temp_rootdir, sparse, dtype):
+        uri = os.path.abspath(
+            os.path.join(
+                temp_rootdir,
+                "test_int_dtypes_"
+                f"{'sparse' if sparse else 'dense'}_"
+                f"{np.dtype(dtype).name}",
+            )
+        )
+
+        dom = tiledb.Domain(tiledb.Dim(domain=(1, 10), dtype=dtype))
+        att = tiledb.Attr(dtype=dtype)
+        schema = tiledb.ArraySchema(domain=dom, attrs=(att,), sparse=sparse)
+        tiledb.Array.create(uri, schema)
+
+        with tiledb.open(uri, mode="w") as A:
+            A[np.arange(1, 11)] = np.random.randint(10, size=10, dtype=dtype)
+
+        result = runner.invoke(root, ["dump", "array", uri, "5"])
+        assert result.exit_code == 0
+
+        result = runner.invoke(root, ["dump", "array", uri, "1:10"])
+        assert result.exit_code == 0
+
+    @pytest.mark.parametrize("dtype", [np.float32, np.float64])
+    def test_float_dtypes(self, runner, temp_rootdir, dtype):
+        uri = os.path.abspath(
+            os.path.join(temp_rootdir, f"test_float_dtypes_{np.dtype(dtype).name}")
+        )
+
+        dom = tiledb.Domain(tiledb.Dim(domain=(1, 10), dtype=dtype))
+        att = tiledb.Attr(dtype=dtype)
+        schema = tiledb.ArraySchema(domain=dom, attrs=(att,), sparse=True)
+        tiledb.Array.create(uri, schema)
+
+        with tiledb.open(uri, mode="w") as A:
+            A[np.arange(1, 11)] = np.random.rand(10)
+
+        result = runner.invoke(root, ["dump", "array", uri, "5"])
+        assert result.exit_code == 0
+
+        result = runner.invoke(root, ["dump", "array", uri, "1:10"])
+        assert result.exit_code == 0
+
+    @pytest.mark.parametrize(
+        "dtype",
+        [
+            "datetime64[Y]",
+            "datetime64[M]",
+            "datetime64[W]",
+            "datetime64[D]",
+            "datetime64[h]",
+            "datetime64[m]",
+            "datetime64[s]",
+            "datetime64[ms]",
+            "datetime64[us]",
+            "datetime64[ns]",
+            # "datetime64[ps]",
+            # "datetime64[fs]",
+            # "datetime64[as]",
+        ],
+    )
+    def test_datetime_dtype(self, runner, temp_rootdir, dtype):
+        uri = os.path.abspath(
+            os.path.join(temp_rootdir, f"test_datetime_dtype_{np.dtype(dtype).name}")
+        )
+
+        dom = tiledb.Domain(
+            tiledb.Dim(
+                domain=(np.datetime64("1970-01-01"), np.datetime64("1980-01-01")),
+                dtype=dtype,
+            )
+        )
+        att = tiledb.Attr(dtype=dtype)
+        schema = tiledb.ArraySchema(domain=dom, attrs=(att,), sparse=True)
+        tiledb.Array.create(uri, schema)
+
+        with tiledb.open(uri, mode="w") as A:
+            A[np.arange(1, 11)] = np.random.randint(low=1, high=10, size=10)
+
+        result = runner.invoke(root, ["dump", "array", uri, "'1970-01-04'"])
+        assert result.exit_code == 0
+
+        result = runner.invoke(
+            root, ["dump", "array", uri, "'1970-01-01':'1980-01-01'"]
+        )
+        assert result.exit_code == 0
+
+    @pytest.mark.parametrize("dtype", [np.dtype("S"), np.dtype("U")])
+    def test_string_dtypes(self, runner, temp_rootdir, dtype):
+        uri = os.path.abspath(
+            os.path.join(temp_rootdir, f"test_numeric_dtypes_{np.dtype(dtype).name}")
+        )
+
+        dom = tiledb.Domain(tiledb.Dim(domain=(1, 10), dtype=np.dtype("S")))
+        att = tiledb.Attr(dtype=dtype)
+        schema = tiledb.ArraySchema(domain=dom, attrs=(att,), sparse=True)
+        tiledb.Array.create(uri, schema)
+
+        with tiledb.open(uri, mode="w") as A:
+            arr = np.char.mod("%d", np.random.randint(10, size=10))
+            print(arr)
+            A[np.arange(1, 11)] = arr
+
+        result = runner.invoke(root, ["dump", "array", uri, "1:10"])
+        assert result.exit_code == 0
+
     def test_dense_25x12(self, runner, temp_rootdir):
         """
         Test for command
@@ -82,18 +203,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12"))
 
-        result = runner.invoke(root, ["dump", "array", uri])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12"])
         assert result.exit_code == 0
-
-        raw_resulting_array = re.findall(r"array\(\[([\s\S]+)\].*\)", result.stdout)
-        assert len(raw_resulting_array) == 1
-
-        resulting_array = raw_resulting_array[0].split(",\n")
-        assert len(resulting_array) == 5
-
-        for row_idx, raw_row in enumerate(resulting_array):
-            resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
-            assert resulting_row == list(range(row_idx * 12, (row_idx + 1) * 12))
 
     def test_dense_25x12_rows(self, runner, temp_rootdir):
         """
@@ -103,18 +214,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12"))
 
-        result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
+        result = runner.invoke(root, ["dump", "array", uri, "-d", "row", "1:25"])
         assert result.exit_code == 0
-
-        raw_resulting_array = re.findall(r"array\(\[([\s\S]+)\].*\)", result.stdout)
-        assert len(raw_resulting_array) == 1
-
-        resulting_array = raw_resulting_array[0].split(",\n")
-        assert len(resulting_array) == 2
-
-        for row_idx, raw_row in enumerate(resulting_array, start=1):
-            resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
-            assert resulting_row == list(range(row_idx * 12, (row_idx + 1) * 12))
 
     def test_dense_25x12x3(self, runner, temp_rootdir):
         """
@@ -124,20 +225,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12x3"))
 
-        result = runner.invoke(root, ["dump", "array", uri])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "1:3"])
         assert result.exit_code == 0
-
-        raw_resulting_3rd_dim = re.findall(r"array\(\[([\s\S]+)\].*\)", result.stdout)
-        assert len(raw_resulting_3rd_dim) == 1
-
-        raw_resulting_2nd_dim = raw_resulting_3rd_dim[0].split(",\n\n")
-        assert len(raw_resulting_2nd_dim) == 5
-
-        for idx_x, raw_2nd_dim_row in enumerate(raw_resulting_2nd_dim):
-            for idx_y, raw_row in enumerate(raw_2nd_dim_row.strip()[1:-1].split(",\n")):
-                resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
-                expected_row = idx_x * 36 + idx_y * 3
-                assert resulting_row == list(range(expected_row, expected_row + 3))
 
     def test_dense_25x12x3_rows(self, runner, temp_rootdir):
         """
@@ -147,20 +236,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12x3"))
 
-        result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
+        result = runner.invoke(root, ["dump", "array", uri, "-d", "x", "2:3"])
         assert result.exit_code == 0
-
-        raw_resulting_3rd_dim = re.findall(r"array\(\[([\s\S]+)\].*\)", result.stdout)
-        assert len(raw_resulting_3rd_dim) == 1
-
-        raw_resulting_2nd_dim = raw_resulting_3rd_dim[0].split(",\n\n")
-        assert len(raw_resulting_2nd_dim) == 2
-
-        for idx_x, raw_2nd_dim_row in enumerate(raw_resulting_2nd_dim, start=1):
-            for idx_y, raw_row in enumerate(raw_2nd_dim_row.strip()[1:-1].split(",\n")):
-                resulting_row = list(map(int, raw_row.strip()[1:-1].split(",")))
-                expected_row = idx_x * 36 + idx_y * 3
-                assert resulting_row == list(range(expected_row, expected_row + 3))
 
     def test_dense_25x12_mult(self, runner, temp_rootdir):
         """
@@ -170,27 +247,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12_mult"))
 
-        result = runner.invoke(root, ["dump", "array", uri])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12"])
         assert result.exit_code == 0
-
-        raw_array = re.findall(r"array\(\[(.*?)\]\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 2
-
-        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
-            resulting_row = list(map(float, raw_a_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[1])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
 
     def test_dense_25x12_mult_rows_attributes(self, runner, temp_rootdir):
         """
@@ -200,19 +258,10 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "dense_25x12_mult"))
 
-        result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3", "-A", "b"])
+        result = runner.invoke(
+            root, ["dump", "array", uri, "-d", "row", "2:3", "-A", "b"]
+        )
         assert result.exit_code == 0
-
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 1
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
 
     def test_sparse_25x12(self, runner, temp_rootdir):
         """
@@ -222,15 +271,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12"))
 
-        result = runner.invoke(root, ["dump", "array", uri])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12"])
         assert result.exit_code == 0
-
-        raw_resulting_array = re.findall(
-            r"array\(\[(.*?)\].*\)", "".join(result.stdout.split())
-        )
-        assert len(raw_resulting_array) == 1
-        resulting_row = list(map(int, raw_resulting_array[0].split(",")))
-        assert resulting_row == list(range(60))
 
     def test_sparse_25x12_rows(self, runner, temp_rootdir):
         """
@@ -240,15 +282,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12"))
 
-        result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3"])
+        result = runner.invoke(root, ["dump", "array", uri, "2:3", "-d", "row"])
         assert result.exit_code == 0
-
-        raw_resulting_array = re.findall(
-            r"array\(\[(.*?)\].*\)", "".join(result.stdout.split())
-        )
-        assert len(raw_resulting_array) == 1
-        resulting_row = list(map(int, raw_resulting_array[0].split(",")))
-        assert resulting_row == list(range(12, 36))
 
     def test_sparse_25x12_mult(self, runner, temp_rootdir):
         """
@@ -258,27 +293,8 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12_mult"))
 
-        result = runner.invoke(root, ["dump", "array", uri])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12"])
         assert result.exit_code == 0
-
-        raw_array = re.findall(r"array\(\[(.*?)\]\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 2
-
-        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
-            resulting_row = list(map(float, raw_a_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[1])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
 
     def test_sparse_25x12_mult_rows_attributes(self, runner, temp_rootdir):
         """
@@ -288,27 +304,10 @@ class TestArray:
         """
         uri = os.path.abspath(os.path.join(temp_rootdir, "sparse_25x12_mult"))
 
-        result = runner.invoke(root, ["dump", "array", uri, "-n", "2", "3", "-A", "b"])
+        result = runner.invoke(
+            root, ["dump", "array", uri, "-d", "row", "2:3", "-A", "b"]
+        )
         assert result.exit_code == 0
-
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 1
-
-        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
-            resulting_row = list(map(float, raw_a_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
 
     @pytest.mark.parametrize("array_name", ["dense_25x12_mult", "sparse_25x12_mult"])
     def test_timestamp(self, runner, temp_rootdir, array_name):
@@ -320,47 +319,12 @@ class TestArray:
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
         # check at timestamp=1
-        result = runner.invoke(root, ["dump", "array", uri, "-t", 1])
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 1
-
-        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
-            resulting_row = list(map(float, raw_a_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", 1])
+        assert result.exit_code == 0
 
         # check at timestamp=2
-        result = runner.invoke(root, ["dump", "array", uri, "-t", 2])
-
-        raw_array = re.findall(r"array\(\[(.*?)\].*\)", "".join(result.stdout.split()))
-        assert len(raw_array) == 1
-
-        raw_a_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_a_dim_row in enumerate(raw_a_dim):
-            resulting_row = list(map(float, raw_a_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x / 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
-
-        raw_b_dim = re.findall(r"\[(.*?)\]", raw_array[0])
-        for row_idx, raw_b_dim_row in enumerate(raw_b_dim, start=1):
-            resulting_row = list(map(float, raw_b_dim_row.split(",")))
-            expected_row = list(
-                map(lambda x: x * 2, range(row_idx * 12, (row_idx + 1) * 12))
-            )
-            assert resulting_row == expected_row
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", 2])
+        assert result.exit_code == 0
 
 
 class TestFragments:
