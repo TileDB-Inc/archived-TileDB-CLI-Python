@@ -7,7 +7,7 @@ from click.testing import CliRunner
 import numpy as np
 import os
 import pytest
-import re
+import tempfile
 
 
 class TestConfig:
@@ -92,6 +92,7 @@ class TestArray:
         uri = os.path.abspath(
             os.path.join(
                 temp_rootdir,
+                tempfile.mkdtemp(),
                 "test_int_dtypes_"
                 f"{'sparse' if sparse else 'dense'}_"
                 f"{np.dtype(dtype).name}",
@@ -115,7 +116,11 @@ class TestArray:
     @pytest.mark.parametrize("dtype", [np.float32, np.float64])
     def test_float_dtypes(self, runner, temp_rootdir, dtype):
         uri = os.path.abspath(
-            os.path.join(temp_rootdir, f"test_float_dtypes_{np.dtype(dtype).name}")
+            os.path.join(
+                temp_rootdir,
+                tempfile.mkdtemp(),
+                f"test_float_dtypes_{np.dtype(dtype).name}",
+            )
         )
 
         dom = tiledb.Domain(tiledb.Dim(domain=(1, 10), dtype=dtype))
@@ -152,7 +157,11 @@ class TestArray:
     )
     def test_datetime_dtype(self, runner, temp_rootdir, dtype):
         uri = os.path.abspath(
-            os.path.join(temp_rootdir, f"test_datetime_dtype_{np.dtype(dtype).name}")
+            os.path.join(
+                temp_rootdir,
+                tempfile.mkdtemp(),
+                f"test_datetime_dtype_{np.dtype(dtype).name}",
+            )
         )
 
         dom = tiledb.Domain(
