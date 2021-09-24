@@ -1,5 +1,4 @@
 import tiledb
-import tiledb.cloud
 
 import click
 import os
@@ -13,7 +12,20 @@ def cloud():
 
         https://tiledb.com/cloud
     """
-    pass
+    from distutils.version import LooseVersion
+
+    cloud_error = (
+        "TileDB Cloud >= 0.7 required for tiledb cloud commands."
+        " Please `pip install tiledb-cloud>= 0.7 to proceed`."
+    )
+
+    try:
+        import tiledb.cloud
+    except ImportError:
+        raise Exception(cloud_error)
+
+    if LooseVersion(tiledb.cloud.__version__) < LooseVersion("0.7"):
+        raise Exception(cloud_error)
 
 
 @click.group()
