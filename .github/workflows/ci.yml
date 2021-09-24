@@ -32,24 +32,24 @@ jobs:
       run: printenv
       shell: bash
       
-    - name: 'Install dependencies'
-      run: python -m pip install .[dev]
+    - name: 'Install TileDB-CLI'
+      run: python -m pip install .[dev,ci]
       shell: bash
 
-    - name: 'Build TileDB and TileDB-CLI extension (Windows)'
-      run: |
-        python setup.py build_ext --inplace
-        python setup.py install
-      shell: bash
-      if: matrix.os == 'windows-latest'
+    # - name: 'Build TileDB and TileDB-CLI extension (Windows)'
+    #   run: |
+    #     python setup.py build_ext --inplace
+    #     python setup.py install
+    #   shell: bash
+    #   if: matrix.os == 'windows-latest'
 
-    - name: 'Build TileDB and TileDB-CLI extension (POSIX)'
-      run: |
-        set -xeo pipefail
-        python setup.py build_ext --inplace
-        python setup.py install
-      shell: bash
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+    # - name: 'Build TileDB and TileDB-CLI extension (POSIX)'
+    #   run: |
+    #     set -xeo pipefail
+    #     python setup.py build_ext --inplace
+    #     python setup.py install
+    #   shell: bash
+    #   if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
     - name: 'Run tests'
       run: |
