@@ -23,11 +23,7 @@ setup(
     url="https://github.com/TileDB-Inc/TileDB-CLI",
     py_modules=["commands.root"],
     packages=["commands"],
-    install_requires=[
-        "click==7.1.2",
-        "setuptools",
-        "tiledb>=0.9",
-    ],
+    install_requires=["click==7.1.2", "setuptools", "tiledb>=0.9", "pandas>=1.0"],
     extras_require={
         "dev": [
             "black",
