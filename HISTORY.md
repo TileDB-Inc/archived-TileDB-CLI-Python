@@ -1,7 +1,11 @@
 # TileDB-CLI 0.0.2 Release Notes
 
+## Command Changes
+* `dump array` refactored to require a selection for each dimension; supports all dtypes [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
+
 ## Packaging Notes
 * Removed NumPy dependency and bumped minimum version of TileDB-Py to 0.9 [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
+* Remove TileDB Cloud as a hard dependency [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
 
 # TileDB-CLI 0.0.1 Release Notes
 
