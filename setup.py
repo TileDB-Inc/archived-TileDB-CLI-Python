@@ -23,7 +23,7 @@ setup(
     url="https://github.com/TileDB-Inc/TileDB-CLI",
     py_modules=["commands.root"],
     packages=["commands"],
-    install_requires=["click==7.1.2", "setuptools", "tiledb>=0.9", "pandas>=1.0"],
+    install_requires=["click==7.1.2", "setuptools", "tiledb>=0.9", "pandas"],
     extras_require={
         "dev": [
             "black",
@@ -33,7 +33,8 @@ setup(
             "wheel",
             "setuptools-scm",
             "pytest",
-        ]
+        ],
+        "ci": ["tiledb-cloud>=0.7"],
     },
     license="MIT",
     use_scm_version={

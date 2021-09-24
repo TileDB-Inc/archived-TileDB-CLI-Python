@@ -16,7 +16,7 @@ def cloud():
 
     cloud_error = (
         "TileDB Cloud >= 0.7 required for tiledb cloud commands."
-        " Please `pip install tiledb-cloud>= 0.7 to proceed`."
+        " Please `pip install tiledb-cloud>=0.7 to proceed`."
     )
 
     try:
