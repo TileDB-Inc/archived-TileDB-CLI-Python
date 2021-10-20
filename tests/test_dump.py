@@ -105,7 +105,10 @@ class TestArray:
         tiledb.Array.create(uri, schema)
 
         with tiledb.open(uri, mode="w") as A:
-            A[np.arange(1, 11)] = np.random.randint(10, size=10, dtype=dtype)
+            if sparse:
+                A[np.arange(1, 11)] = np.random.randint(10, size=10, dtype=dtype)
+            else:
+                A[:] = np.random.randint(10, size=10, dtype=dtype)
 
         result = runner.invoke(root, ["dump", "array", uri, "5"])
         assert result.exit_code == 0
