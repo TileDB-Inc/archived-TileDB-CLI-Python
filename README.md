@@ -20,12 +20,13 @@ This will create `tiledb` (in `/usr/local/bin`, or other paths specific to `venv
 
 ## Commands
 
-All commands begin with `tiledb` and are grouped into the follow command subgroups:
+All commands begin with `tiledb` and are grouped into the following commands and command subgroups:
 * [cloud](#cloud): Perform TileDB Cloud tasks.
 * [convert_from](#convert_from): Convert to and from TileDB arrays and other common file formats.
 * [consolidate](#consolidate): Consolidate TileDB array fragments.
 * [dump](#dump): Output information about TileDB arrays.
 * [vacuum](#vacuum): Vacuum TileDB array fragments that have already been consolidated.
+* delete-fragments: Remove a time range of fragments from an already existing array.
 
 ### cloud
 * array
