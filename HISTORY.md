@@ -2,6 +2,7 @@
 
 ## Command Changes
 * `dump array` refactored to require a selection for each dimension; supports all dtypes [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
+* Addition of `delete-fragments` to remove a time range of fragments from a given array [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
 
 ## Packaging Notes
 * Removed NumPy dependency and bumped minimum version of TileDB-Py to 0.9 [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
