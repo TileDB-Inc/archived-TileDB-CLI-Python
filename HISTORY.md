@@ -5,8 +5,9 @@
 * Addition of `delete-fragments` to remove a time range of fragments from a given array [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
 
 ## Packaging Notes
-* Removed NumPy dependency and bumped minimum version of TileDB-Py to 0.9 [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
+* Remove NumPy dependency [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
 * Remove TileDB Cloud as a hard dependency [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
+* Bump minimum required version of TileDB-Py to 0.10.5 [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
 
 # TileDB-CLI 0.0.1 Release Notes
 
