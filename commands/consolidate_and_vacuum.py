@@ -206,37 +206,6 @@ def vacuum_array_metadata(uri):
     tiledb.vacuum(uri, ctx=tiledb.Ctx(config))
 
 
-@click.command("delete-fragments")
-@click.argument("uri")
-@click.argument("time-start", type=int)
-@click.argument("time-end", type=int)
-@click.option(
-    "--verbose",
-    "-v",
-    help=("Output the fragment file names as they are deleted"),
-    is_flag=True,
-    default=False,
-)
-@click.option(
-    "--dry-run",
-    "-n",
-    help=("Perform a trial run with no changes made"),
-    is_flag=True,
-    default=False,
-)
-def delete_fragments(uri, time_start, time_end, verbose, dry_run):
-    """
-    Delete a range of fragments from time-start to time-end (inclusive) in an
-    array located at uri. The range is a UNIX timestamp.
-    """
-    tiledb.delete_fragments(
-        uri,
-        timestamp_range=(time_start, time_end),
-        verbose=verbose,
-        dry_run=dry_run,
-    )
-
-
 consolidate.add_command(consolidate_fragments)
 consolidate.add_command(consolidate_fragment_metadata)
 consolidate.add_command(consolidate_array_metadata)
