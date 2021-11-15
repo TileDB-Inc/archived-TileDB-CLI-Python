@@ -27,7 +27,6 @@ All commands begin with `tiledb` and are grouped into the following subgroups:
 * [dump](#dump): Output information about TileDB arrays.
 * [fragments](#fragments): Perform various tasks on TileDB array fragments.
 * [vacuum](#vacuum): Vacuum TileDB array fragments, fragment metadata, or and array metadata that have already been consolidated.
-* delete-fragments: Remove a time range of fragments from an already existing array.
 
 ### cloud
 * array
