@@ -1,3 +1,6 @@
+# TileDB-CLI 0.0.3 Release Notes
+* Addition `fragments` subcommand which includes `fragments delete` - renamed from `delete-fragments` - and `fragments copy` - which creates a new array by copying a range of fragments from an already existing array [#22](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
+* 
 # TileDB-CLI 0.0.2 Release Notes
 
 ## Command Changes
