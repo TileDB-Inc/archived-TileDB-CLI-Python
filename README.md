@@ -20,12 +20,13 @@ This will create `tiledb` (in `/usr/local/bin`, or other paths specific to `venv
 
 ## Commands
 
-All commands begin with `tiledb` and are grouped into the following commands and command subgroups:
+All commands begin with `tiledb` and are grouped into the following subgroups:
 * [cloud](#cloud): Perform TileDB Cloud tasks.
 * [convert_from](#convert_from): Convert to and from TileDB arrays and other common file formats.
-* [consolidate](#consolidate): Consolidate TileDB array fragments.
+* [consolidate](#consolidate): Consolidate TileDB array fragments, fragment metadata, or and array metadata.
 * [dump](#dump): Output information about TileDB arrays.
-* [vacuum](#vacuum): Vacuum TileDB array fragments that have already been consolidated.
+* [fragments](#fragments): Perform various tasks on TileDB array fragments.
+* [vacuum](#vacuum): Vacuum TileDB array fragments, fragment metadata, or and array metadata that have already been consolidated.
 * delete-fragments: Remove a time range of fragments from an already existing array.
 
 ### cloud
@@ -55,6 +56,9 @@ All commands begin with `tiledb` and are grouped into the following commands and
 * metadata: Output the metadata of a TileDB array located at uri.
 * nonemptydomain`: Output the non-empty domain of a TileDB array located at uri.
 * schema: Output the schema of a TileDB array located at uri.
+### fragments
+* copy: Copy a range of fragments from an already existing array to create a new array.
+* delete: Delete a range of fragments from an array.
 ### vacuum
 * array-metadata: Vacuum the already consolidated array metadata in an array located at uri.
 * fragment-metadata: Vacuum the already consolidated fragments in an array located at uri.
