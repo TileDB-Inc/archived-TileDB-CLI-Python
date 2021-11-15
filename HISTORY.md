@@ -1,16 +1,21 @@
 # TileDB-CLI 0.0.3 Release Notes
-* Addition `fragments` subcommand which includes `fragments delete` - renamed from `delete-fragments` - and `fragments copy` - which creates a new array by copying a range of fragments from an already existing array [#22](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
 
-# TileDB-CLI 0.0.2 Release Notes
+## Packaging Notes
+* TileDB-Py version bumped to 0.11.0 [#22](https://github.com/TileDB-Inc/TileDB-CLI/pull/22)
 
 ## Command Changes
-* `dump array` refactored to require a selection for each dimension; supports all dtypes [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
-* Addition of `delete-fragments` to remove a time range of fragments from a given array [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
+* Addition `fragments` subcommand which includes `fragments delete` - renamed from `delete-fragments` - and `fragments copy` - which creates a new array by copying a range of fragments from an already existing array [#22](https://github.com/TileDB-Inc/TileDB-CLI/pull/22)
+
+# TileDB-CLI 0.0.2 Release Notes
 
 ## Packaging Notes
 * Remove NumPy dependency [#16](https://github.com/TileDB-Inc/TileDB-CLI/pull/16)
 * Remove TileDB Cloud as a hard dependency [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
 * Bump minimum required version of TileDB-Py to 0.10.5 [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
+
+## Command Changes
+* `dump array` refactored to require a selection for each dimension; supports all dtypes [#19](https://github.com/TileDB-Inc/TileDB-CLI/pull/19)
+* Addition of `delete-fragments` to remove a time range of fragments from a given array [#21](https://github.com/TileDB-Inc/TileDB-CLI/pull/21)
 
 # TileDB-CLI 0.0.1 Release Notes
 
