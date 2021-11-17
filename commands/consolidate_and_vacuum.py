@@ -8,7 +8,7 @@ def consolidate():
     """
     Consolidate TileDB array fragments. For more information, see
 
-        https://docs.tiledb.com/main/solutions/tiledb-embedded/internal-mechanics/consolidation
+        https://docs.tiledb.com/main/concepts/internal-mechanics/consolidation
     """
 
 
@@ -17,9 +17,8 @@ def vacuum():
     """
     Vacuum TileDB array fragments that have already been consolidated. For more information, see
 
-        https://docs.tiledb.com/main/solutions/tiledb-embedded/internal-mechanics/consolidation#vacuuming
+        https://docs.tiledb.com/main/concepts/internal-mechanics/consolidation#vacuuming
     """
-    pass
 
 
 @click.command("fragments")
