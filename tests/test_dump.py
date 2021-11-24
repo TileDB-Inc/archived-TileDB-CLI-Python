@@ -22,6 +22,23 @@ class TestConfig:
         assert result.stdout.split() == tiledb.Config().__repr__().split()
 
 
+class TestMBRs:
+    @pytest.mark.parametrize("array_name", test_array_names)
+    def test(self, runner, temp_rootdir, array_name, pp):
+        """
+        Test for command
+
+            tiledb dump mbr [array_uri]
+        """
+        uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
+
+        result = runner.invoke(root, ["dump", "mbrs", uri])
+        assert result.exit_code == 0
+
+        fragments = tiledb.array_fragments(uri, include_mbrs=True)
+        assert result.stdout.split() == pp.pformat(fragments.mbrs).split()
+
+
 class TestMetadata:
     @pytest.mark.parametrize("array_name", test_array_names)
     def test(self, runner, temp_rootdir, array_name, pp):

@@ -25,6 +25,41 @@ def config():
 
 @click.command()
 @click.argument("uri")
+@click.option(
+    "--index",
+    "-i",
+    metavar="<int>",
+    help=(
+        "Output MBR from the given fragment number. Zero indexing is used. "
+        "By default, MBRs from all fragments are shown"
+    ),
+    type=int,
+    default=None,
+)
+def mbrs(uri, index):
+    """
+    Output the minimum bounding rectangles of a sparse TileDB array located at uri.
+    """
+    pp = pprint.PrettyPrinter()
+
+    fragments = tiledb.array_fragments(uri, include_mbrs=True)
+
+    if not hasattr(fragments, "mbrs"):
+        click.echo(
+            "Error: no MBRs found in the given array",
+            err=True,
+        )
+
+    mbrs = fragments.mbrs
+
+    if index is not None:
+        mbrs = mbrs[index]
+
+    click.echo(pp.pformat(mbrs))
+
+
+@click.command()
+@click.argument("uri")
 def metadata(uri):
     """
     Output the metadata of a TileDB array located at uri.
@@ -204,6 +239,7 @@ def fragments(uri, index, number):
 
 dump.add_command(array)
 dump.add_command(config)
+dump.add_command(mbrs)
 dump.add_command(metadata)
 dump.add_command(nonempty_domain)
 dump.add_command(schema)
