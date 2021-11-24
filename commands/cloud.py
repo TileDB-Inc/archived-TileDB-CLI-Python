@@ -548,7 +548,9 @@ def dump_task(property_, array, cost, duration, last, namespace, status, start, 
     if kwargs["status"]:
         kwargs["status"].upper()
 
-    tasks = tiledb.cloud.tasks(**kwargs, page=1, per_page=last).to_dict()["array_tasks"]
+    tasks = tiledb.cloud.tasks.tasks(**kwargs, page=1, per_page=last).to_dict()[
+        "array_tasks"
+    ]
 
     if cost:
         click.echo(f"Accumulated cost: {sum([t['cost'] for t in tasks])}")
