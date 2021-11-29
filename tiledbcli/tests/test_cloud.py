@@ -1,7 +1,7 @@
 import tiledb
 import tiledb.cloud
 from common import test_array_names
-from commands.root import root
+from tiledbcli.root import root
 
 import os
 import pytest
