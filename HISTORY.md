@@ -1,7 +1,7 @@
 # TileDB-CLI 0.0.4 Release Notes
 
 ## Command Changes
-* Addition of `tiledb dump mbrs` to output minimum bounding reactangles for a given fragment (01f367)[https://github.com/TileDB-Inc/TileDB-CLI/commit/01f3675daa8dcc8124e02c332d18bd1d8e589da6]
+* Addition of `tiledb dump mbrs` to output minimum bounding reactangles for a given fragment [01f367](https://github.com/TileDB-Inc/TileDB-CLI/commit/01f3675daa8dcc8124e02c332d18bd1d8e589da6)
 
 # TileDB-CLI 0.0.3 Release Notes
 
