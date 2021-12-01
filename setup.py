@@ -21,8 +21,8 @@ setup(
     maintainer="TileDB, Inc.",
     maintainer_email="help@tiledb.io",
     url="https://github.com/TileDB-Inc/TileDB-CLI",
-    py_modules=["tiledbcli.root"],
-    packages=["tiledbcli"],
+    py_modules=["tiledb_cli.root"],
+    packages=["tiledb_cli"],
     install_requires=["click==7.1.2", "setuptools", "tiledb>=0.11.0", "pandas"],
     extras_require={
         "dev": [
@@ -44,7 +44,7 @@ setup(
     },
     entry_points="""
         [console_scripts]
-        tiledb=tiledbcli.root:root
+        tiledb=tiledb_cli.root:root
     """,
     classifiers=[
         "Development Status :: 4 - Beta",
