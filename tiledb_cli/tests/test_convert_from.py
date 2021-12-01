@@ -1,6 +1,6 @@
 import tiledb
-from tiledbcli.root import root
-from tiledbcli.convert_from import parse_kwargs
+from tiledb_cli.root import root
+from tiledb_cli.convert_from import parse_kwargs
 
 from click.testing import CliRunner
 import os
