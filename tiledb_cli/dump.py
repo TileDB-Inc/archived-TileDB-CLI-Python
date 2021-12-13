@@ -1,5 +1,5 @@
-from numpy.lib.function_base import i0
 import tiledb
+from .utils import to_unix_time
 
 import click
 import pprint
@@ -120,9 +120,9 @@ def schema(uri):
 @click.option(
     "--timestamp",
     "-t",
-    metavar="<unix seconds>",
-    help=("Output data from the array at the given TileDB timestamp."),
-    type=int,
+    metavar="<unix seconds | iso 8601 date>",
+    help=("Output data from the array at the given UNIX timestamp or ISO 8601 date."),
+    type=str,
     default=None,
 )
 def array(uri, selection, attribute, dimension, timestamp):
@@ -161,6 +161,9 @@ def array(uri, selection, attribute, dimension, timestamp):
         # 1     2  2
     """
     import numpy as np
+
+    if timestamp:
+        timestamp = to_unix_time(timestamp)
 
     with tiledb.open(uri, timestamp=timestamp) as array:
         pp = pprint.PrettyPrinter()

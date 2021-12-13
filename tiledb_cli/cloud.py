@@ -1,4 +1,5 @@
 import tiledb
+from .utils import to_unix_time
 
 import click
 import os
@@ -463,8 +464,7 @@ def activity(uri, last):
     "--time-start",
     "-s",
     "start",
-    type=int,
-    metavar="<int>",
+    type=str,
     help=("Upper range of time period to filter"),
     default=None,
 )
@@ -472,8 +472,7 @@ def activity(uri, last):
     "--time-end",
     "-e",
     "end",
-    type=int,
-    metavar="<int>",
+    type=str,
     help=("Lower range of time period to filter"),
     default=None,
 )
@@ -551,6 +550,12 @@ def dump_task(property_, array, cost, duration, last, namespace, status, start, 
     tasks = tiledb.cloud.tasks.tasks(**kwargs, page=1, per_page=last).to_dict()[
         "array_tasks"
     ]
+
+    if start:
+        start = to_unix_time(start)
+
+    if end:
+        end = to_unix_time(end)
 
     if cost:
         click.echo(f"Accumulated cost: {sum([t['cost'] for t in tasks])}")
