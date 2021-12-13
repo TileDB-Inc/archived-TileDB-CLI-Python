@@ -348,11 +348,18 @@ class TestArray:
         uri = os.path.abspath(os.path.join(temp_rootdir, array_name))
 
         # check at timestamp=1
-        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", 1])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", "1"])
         assert result.exit_code == 0
 
         # check at timestamp=2
-        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", 2])
+        result = runner.invoke(root, ["dump", "array", uri, "1:25", "1:12", "-t", "2"])
+        assert result.exit_code == 0
+
+        # check at ISO 1970-01-01T00:00:01 (unix time=1)
+        result = runner.invoke(
+            root,
+            ["dump", "array", uri, "1:25", "1:12", "-t", "1970-01-01T00:00:01"],
+        )
         assert result.exit_code == 0
 
 

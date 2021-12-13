@@ -41,14 +41,14 @@ def uri(temp_rootdir):
 @pytest.mark.skipif(
     sys.platform == "win32", reason="VFS.copy() does not run on windows"
 )
-def test_copy_fragments(runner, uri, temp_rootdir):
+def test_copy_fragments_unix(runner, uri, temp_rootdir):
     """
     Test for command
 
         tiledb fragments copy [old_array_uri] [new_array_uri] [start_time] [end_time]
     """
     old_uri = uri
-    new_uri = os.path.abspath(os.path.join(temp_rootdir, "test_copy_fragments_new"))
+    new_uri = os.path.abspath(os.path.join(temp_rootdir, "test_copy_fragments_unix"))
 
     result = runner.invoke(
         root, ["fragments", "copy", "-v", old_uri, new_uri, "2", "3"]
@@ -64,7 +64,42 @@ def test_copy_fragments(runner, uri, temp_rootdir):
     assert fragments.timestamp_range == ((2, 2), (3, 3))
 
 
-def test_delete_fragments(runner, uri):
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="VFS.copy() does not run on windows"
+)
+def test_copy_fragments_iso(runner, uri, temp_rootdir):
+    """
+    Test for command
+
+        tiledb fragments copy [old_array_uri] [new_array_uri] [start_time] [end_time]
+    """
+    old_uri = uri
+    new_uri = os.path.abspath(os.path.join(temp_rootdir, "test_copy_fragments_iso"))
+
+    result = runner.invoke(
+        root,
+        [
+            "fragments",
+            "copy",
+            "-v",
+            old_uri,
+            new_uri,
+            "1970-01-01T00:00:02Z",
+            "1970-01-01T00:00:03Z",
+        ],
+    )
+    assert result.exit_code == 0
+
+    fragments = tiledb.array_fragments(old_uri)
+    assert len(fragments) == 3
+    assert fragments.timestamp_range == ((1, 1), (2, 2), (3, 3))
+
+    fragments = tiledb.array_fragments(new_uri)
+    assert len(fragments) == 2
+    assert fragments.timestamp_range == ((2, 2), (3, 3))
+
+
+def test_delete_fragments_unix(runner, uri):
     """
     Test for command
 
@@ -75,6 +110,34 @@ def test_delete_fragments(runner, uri):
     assert fragments.timestamp_range == ((1, 1), (2, 2), (3, 3))
 
     result = runner.invoke(root, ["fragments", "delete", "-v", uri, "1", "1"])
+    assert result.exit_code == 0
+
+    fragments = tiledb.array_fragments(uri)
+    assert len(fragments) == 2
+    assert fragments.timestamp_range == ((2, 2), (3, 3))
+
+
+def test_delete_fragments_iso(runner, uri):
+    """
+    Test for command
+
+        tiledb fragments delete [array_uri] [start_time] [end_time]
+    """
+    fragments = tiledb.array_fragments(uri)
+    assert len(fragments) == 3
+    assert fragments.timestamp_range == ((1, 1), (2, 2), (3, 3))
+
+    result = runner.invoke(
+        root,
+        [
+            "fragments",
+            "delete",
+            "-v",
+            uri,
+            "1970-01-01T00:00:01Z",
+            "1970-01-01T00:00:01Z",
+        ],
+    )
     assert result.exit_code == 0
 
     fragments = tiledb.array_fragments(uri)
