@@ -40,7 +40,7 @@ setup(
             "setuptools-scm",
             "pytest",
         ],
-        "ci": ["tiledb-cloud>=0.7"],
+        "ci": ["tiledb-cloud>=0.7.17"],
     },
     license="MIT",
     use_scm_version={
