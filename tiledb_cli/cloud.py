@@ -16,8 +16,8 @@ def cloud():
     from distutils.version import LooseVersion
 
     cloud_error = (
-        "TileDB Cloud >= 0.7 required for tiledb cloud commands."
-        " Please `pip install tiledb-cloud>=0.7 to proceed`."
+        "TileDB Cloud >= 0.7.17 required for tiledb cloud commands."
+        " Please `pip install tiledb-cloud>=0.7.17 to proceed`."
     )
 
     try:
