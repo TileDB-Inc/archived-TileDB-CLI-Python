@@ -68,11 +68,11 @@ All commands begin with `tiledb` and are grouped into the following subgroups:
 Create an array from a CSV file.
 ```
 > cat example.csv
-a b
-1 dog
-2 cat
-8 bird
-20 elephant
+a,b
+1,dog
+2,cat
+8,bird
+20,elephant
 > tiledb convert-from csv example.csv example.tdb
 ```
 
