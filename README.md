@@ -58,7 +58,7 @@ All commands begin with `tiledb` and are grouped into the following subgroups:
 * schema: Output the schema of a TileDB array.
 * versions: Output the version information for the embedded library and Python package.
 ### fragments
-* copy: Copy a range of fragments from an already existing array to create a new array.
+* copy: Copy a range of fragments from an already existing array to another array.
 * delete: Delete a range of fragments from an array.
 ### vacuum
 * array-metadata: Vacuum the already consolidated array metadata in an array.

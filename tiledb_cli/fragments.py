@@ -35,7 +35,8 @@ def fragments():
 def fragments_copy(uri_src, uri_dst, time_start, time_end, verbose, dry_run):
     """
     (POSIX only). Copy a range of fragments from time-start to time-end (inclusive)
-    in an array located at uri-src to create a new array at uri-dst. The range may be formatted in UNIX seconds or ISO 8601.
+    in an array located at uri-src to an array at uri-dst. If the array does not
+    exist, it will be created. The range may be formatted in UNIX seconds or ISO 8601.
     """
     if time_start:
         time_start = to_unix_time(time_start)
@@ -43,7 +44,13 @@ def fragments_copy(uri_src, uri_dst, time_start, time_end, verbose, dry_run):
     if time_end:
         time_end = to_unix_time(time_end)
 
-    tiledb.create_array_from_fragments(
+    copy_fragments_to_array = (
+        tiledb.copy_fragments_to_existing_array
+        if tiledb.array_exists(uri_dst)
+        else tiledb.create_array_from_fragments
+    )
+
+    copy_fragments_to_array(
         uri_src,
         uri_dst,
         timestamp_range=(time_start, time_end),
