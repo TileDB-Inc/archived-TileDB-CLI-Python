@@ -111,4 +111,7 @@ tiledb/version.py
 # IntelliJ
 .idea
 
+# TileDB-CLI
+version.py
+
 *.DS_Store

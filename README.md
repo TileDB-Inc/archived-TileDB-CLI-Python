@@ -56,6 +56,7 @@ All commands begin with `tiledb` and are grouped into the following subgroups:
 * metadata: Output the metadata of a TileDB array.
 * nonempty-domain`: Output the non-empty domain of a TileDB array.
 * schema: Output the schema of a TileDB array.
+* versions: Output the version information for the embedded library and Python package.
 ### fragments
 * copy: Copy a range of fragments from an already existing array to create a new array.
 * delete: Delete a range of fragments from an array.

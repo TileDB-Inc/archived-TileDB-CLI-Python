@@ -1,3 +1,8 @@
+# TileDB-CLI 0.0.5 Release Notes
+
+## Command Changes
+* Addition of `tiledb dump versions` to output version information for TileDB Embedded and TileDB-Py [#29](https://github.com/TileDB-Inc/TileDB-CLI/pull/29)
+
 # TileDB-CLI 0.0.4 Release Notes
 
 ## Command Changes

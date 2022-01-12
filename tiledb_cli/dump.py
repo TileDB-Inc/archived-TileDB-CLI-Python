@@ -240,6 +240,16 @@ def fragments(uri, index, number):
     click.echo(pp.pformat(fragments))
 
 
+@click.command()
+def versions():
+    """
+    Output the TileDB version information for the embedded library (libtiledb)
+    and Python package.
+    """
+    click.echo(f"{'TileDB':<12} {'.'.join(map(str, tiledb.libtiledb.version()))}")
+    click.echo(f"{'TileDB-Py':<12} {tiledb.version.version}")
+
+
 dump.add_command(array)
 dump.add_command(config)
 dump.add_command(mbrs)
@@ -247,3 +257,4 @@ dump.add_command(metadata)
 dump.add_command(nonempty_domain)
 dump.add_command(schema)
 dump.add_command(fragments)
+dump.add_command(versions)

@@ -439,3 +439,18 @@ class TestFragments:
         assert output["sparse"] == (True, True)
         assert output["to_vacuum"] == ()
         assert output["unconsolidated_metadata_num"] == 2
+
+
+class TestVersions:
+    def test_versions(self, runner):
+        """
+        Test for command
+
+            tiledb dump versions
+        """
+        result = runner.invoke(root, ["dump", "versions"])
+        assert result.exit_code == 0
+
+        output = result.stdout.split()
+        assert output[0] == "TileDB"
+        assert output[2] == "TileDB-Py"
