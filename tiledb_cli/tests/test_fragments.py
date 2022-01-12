@@ -61,7 +61,7 @@ def test_copy_fragments_to_new(runner, uri, temp_rootdir, start_time, end_time):
 
     result = runner.invoke(
         root,
-        ["fragments", "copy", "-v", old_uri, new_uri, start_time, end_time],
+        ["fragments", "copy", "-f", old_uri, new_uri, start_time, end_time],
     )
     assert result.exit_code == 0
 
@@ -110,7 +110,7 @@ def test_copy_fragments_to_existing(runner, uri, temp_rootdir, start_time, end_t
 
     result = runner.invoke(
         root,
-        ["fragments", "copy", "-v", old_uri, new_uri, start_time, end_time],
+        ["fragments", "copy", "-f", old_uri, new_uri, start_time, end_time],
     )
     assert result.exit_code == 0
 
@@ -134,7 +134,7 @@ def test_delete_fragments_unix(runner, uri, ts):
     assert len(fragments) == 3
     assert fragments.timestamp_range == ((1, 1), (2, 2), (3, 3))
 
-    result = runner.invoke(root, ["fragments", "delete", "-v", uri, ts, ts])
+    result = runner.invoke(root, ["fragments", "delete", "-f", uri, ts, ts])
     assert result.exit_code == 0
 
     fragments = tiledb.array_fragments(uri)

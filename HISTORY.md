@@ -2,6 +2,7 @@
 
 ## Command Changes
 * Addition of `tiledb dump versions` to output version information for TileDB Embedded and TileDB-Py [#29](https://github.com/TileDB-Inc/TileDB-CLI/pull/29)
+* `tiledb fragments copy` expanded to also copy fragments to already existing arrays []()
 
 # TileDB-CLI 0.0.4 Release Notes
 

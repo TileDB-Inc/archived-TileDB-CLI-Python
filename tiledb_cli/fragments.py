@@ -1,5 +1,5 @@
 import tiledb
-from .utils import to_unix_time
+from .utils import to_unix_time, prompt_poweruser
 
 import click
 
@@ -32,12 +32,22 @@ def fragments():
     is_flag=True,
     default=False,
 )
-def fragments_copy(uri_src, uri_dst, time_start, time_end, verbose, dry_run):
+@click.option(
+    "--force",
+    "-f",
+    help=("Bypass the poweruser warning"),
+    is_flag=True,
+    default=False,
+)
+def fragments_copy(uri_src, uri_dst, time_start, time_end, verbose, dry_run, force):
     """
     (POSIX only). Copy a range of fragments from time-start to time-end (inclusive)
     in an array located at uri-src to an array at uri-dst. If the array does not
     exist, it will be created. The range may be formatted in UNIX seconds or ISO 8601.
     """
+    if not force:
+        prompt_poweruser()
+
     if time_start:
         time_start = to_unix_time(time_start)
 
@@ -77,11 +87,21 @@ def fragments_copy(uri_src, uri_dst, time_start, time_end, verbose, dry_run):
     is_flag=True,
     default=False,
 )
-def fragments_delete(uri, time_start, time_end, verbose, dry_run):
+@click.option(
+    "--force",
+    "-f",
+    help=("Bypass the poweruser warning"),
+    is_flag=True,
+    default=False,
+)
+def fragments_delete(uri, time_start, time_end, verbose, dry_run, force):
     """
     Delete a range of fragments from time-start to time-end (inclusive) in an
     array located at uri. The range is a UNIX timestamp.
     """
+    if not force:
+        prompt_poweruser()
+
     if time_start:
         time_start = to_unix_time(time_start)
 
