@@ -26,7 +26,7 @@ setup(
     install_requires=[
         "click==7.1.2",
         "setuptools",
-        "tiledb>=0.11.0",
+        "tiledb>=0.12.0",
         "pandas",
         "iso8601",
     ],
