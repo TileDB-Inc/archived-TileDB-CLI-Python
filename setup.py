@@ -24,7 +24,7 @@ setup(
     py_modules=["tiledb_cli.root"],
     packages=["tiledb_cli"],
     install_requires=[
-        "click==7.1.2",
+        "click",
         "setuptools",
         "tiledb>=0.12.0",
         "pandas",
